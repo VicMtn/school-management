@@ -1,25 +1,17 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
 
-# Nettoyer la base de données
+
+# Cleaning database
 puts "Cleaning database..."
 [Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass].each do |model|
   model.delete_all
 end
 
-# Créer les statuts
+# Create statuses
 puts "Creating statuses..."
 active_status = Status.create!(title: "Active", slug: "active")
 inactive_status = Status.create!(title: "Inactive", slug: "inactive")
 
-# Créer les adresses
+# Create addresses
 puts "Creating addresses..."
 addresses = [
   Address.create!(zip: 75001, town: "Paris", street: "Rue de Rivoli", number: "1"),
@@ -44,7 +36,7 @@ addresses = [
   Address.create!(zip: 75020, town: "Paris", street: "Rue de Ménilmontant", number: "20")
 ]
 
-# Créer les salles
+# Create rooms
 puts "Creating rooms..."
 rooms = [
   Room.create!(name: "101"),
@@ -57,7 +49,7 @@ rooms = [
   Room.create!(name: "402")
 ]
 
-# Créer les secteurs
+# Create sectors
 puts "Creating sectors..."
 sectors = [
   Sector.create!(name: "Sciences"),
@@ -66,7 +58,7 @@ sectors = [
   Sector.create!(name: "Technologies")
 ]
 
-# Créer les moments (périodes)
+# Create moments (periods)
 puts "Creating moments..."
 current_moment = Moment.create!(
   uid: "2024-S1",
@@ -75,7 +67,7 @@ current_moment = Moment.create!(
   moment_type: 0
 )
 
-# Créer les doyens
+# Create deans
 puts "Creating deans..."
 deans = [
   Dean.create!(
@@ -100,7 +92,7 @@ deans = [
   )
 ]
 
-# Créer les professeurs
+# Create teachers
 puts "Creating teachers..."
 teachers = [
   Teacher.create!(
@@ -135,7 +127,7 @@ teachers = [
   )
 ]
 
-# Créer les matières
+# Create subjects
 puts "Creating subjects..."
 subjects = [
   Subject.create!(
@@ -170,7 +162,7 @@ subjects = [
   )
 ]
 
-# Créer les classes
+# Create school classes
 puts "Creating school classes..."
 school_classes = [
   SchoolClass.create!(
@@ -191,7 +183,7 @@ school_classes = [
   )
 ]
 
-# Créer les étudiants
+# Create students
 puts "Creating students..."
 students = [
   Student.create!(
@@ -346,7 +338,7 @@ students = [
   )
 ]
 
-# Associer les étudiants aux classes (8 dans la première classe, 7 dans la seconde)
+# Associate students with classes (8 in the first class, 7 in the second)
 puts "Associating students with classes..."
 students[0..7].each do |student|
   StudentsClass.create!(student: student, school_class: school_classes[0])
@@ -355,7 +347,7 @@ students[8..14].each do |student|
   StudentsClass.create!(student: student, school_class: school_classes[1])
 end
 
-# Créer les cours
+# Create courses
 puts "Creating courses..."
 courses = [
   Course.create!(
@@ -420,7 +412,7 @@ courses = [
   )
 ]
 
-# Créer les examens
+# Create examinations
 puts "Creating examinations..."
 examinations = [
   Examination.create!(
@@ -445,7 +437,7 @@ examinations = [
   )
 ]
 
-# Créer les notes
+# Create grades
 puts "Creating grades..."
 students[0..7].each do |student|
   Grade.create!(
@@ -465,8 +457,8 @@ students[8..14].each do |student|
   )
 end
 
-# Vérifications
-puts "\nVérification des données créées :"
+# Verifications
+puts "\nVerifications of created data :"
 puts "--------------------------------"
 puts "Status : #{Status.count}"
 puts "Addresses : #{Address.count}"
@@ -485,11 +477,11 @@ puts "Examinations : #{Examination.count}"
 puts "Grades : #{Grade.count}"
 puts "--------------------------------"
 
-puts "\nVérification des associations :"
+puts "\nVerifications of associations :"
 puts "--------------------------------"
-puts "Première classe (1A) : #{school_classes[0].students_classes.count} étudiants"
-puts "Deuxième classe (1B) : #{school_classes[1].students_classes.count} étudiants"
-puts "Nombre de cours par professeur :"
+puts "First class (1A) : #{school_classes[0].students_classes.count} students"
+puts "Second class (1B) : #{school_classes[1].students_classes.count} students"
+puts "Number of courses per teacher :"
 teachers.each do |teacher|
   puts "- #{teacher.full_name} : #{teacher.courses.count} cours"
 end
