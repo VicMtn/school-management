@@ -1,8 +1,6 @@
 class Dean < Person
   has_many :school_classes, foreign_key: 'master_id'
 
-  validates :role, inclusion: { in: %w[dean] }
-
   def current_classes
     school_classes.joins(:moment).where('moments.end_on >= ?', Date.current)
   end
