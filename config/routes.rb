@@ -1,26 +1,39 @@
 Rails.application.routes.draw do
-  devise_for :users, skip: [:registrations]
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
+  
   devise_scope :user do
     get 'users/edit', to: 'users/registrations#edit', as: 'edit_user_registration'
     put 'users', to: 'users/registrations#update', as: 'user_registration'
     delete 'users', to: 'users/registrations#destroy'
   end
-  # Defines the root path route ("/")
-  root "dashboard#index"
 
-  # People management
-  resources :people
+  concern :admin_accessible do
+    member do
+      post :create_user
+    end
+  end
+
+  resources :people, concerns: :admin_accessible
   resources :students
   resources :teachers
   resources :deans
+  resources :courses
+  resources :subjects
+  resources :promotion_asserts
+
+  namespace :admin do
+    root to: 'dashboard#index'
+  end
+
+  # Defines the root path route ("/")
+  root "dashboard#index"
 
   # Academic resources
   resources :grades
   resources :examinations
-  resources :courses
   resources :school_classes
-  resources :subjects
-  resources :promotion_asserts
   resources :moments
   resources :sectors
   resources :statuses
