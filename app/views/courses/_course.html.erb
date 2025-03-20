@@ -1,0 +1,34 @@
+<div id="<%= dom_id course %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Start at:</strong>
+    <%= course.start_at %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">End at:</strong>
+    <%= course.end_at %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Archived:</strong>
+    <%= course.archived? ? "Yes" : "No" %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Subject:</strong>
+    <%= course.subject_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">School class:</strong>
+    <%= course.school_class_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Moment:</strong>
+    <%= course.moment_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Teacher:</strong>
+    <%= course.teacher_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Week day:</strong>
+    <%= course.week_day %>
+  </div>
+</div>

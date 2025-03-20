@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uid: MyString
+  start_on: 2025-03-20
+  end_on: 2025-03-20
+  moment_type: 1
+
+two:
+  uid: MyString
+  start_on: 2025-03-20
+  end_on: 2025-03-20
+  moment_type: 1
