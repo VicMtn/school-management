@@ -1,7 +1,10 @@
 class Person < ApplicationRecord
+  include PersonType
+  
   belongs_to :status
   belongs_to :address
   belongs_to :user, optional: true
+  has_many :addresses, dependent: :destroy
 
   validates :username, presence: true, uniqueness: true
   validates :lastname, presence: true

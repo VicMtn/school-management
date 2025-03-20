@@ -8,4 +8,8 @@ class Dean < Person
   def students_count
     current_classes.joins(:students_classes).distinct.count('students_classes.student_id')
   end
+
+  def dean?
+    true
+  end
 end 
