@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
   devise_for :users, skip: [:registrations]
+  devise_scope :user do
+    get 'users/edit', to: 'users/registrations#edit', as: 'edit_user_registration'
+    put 'users', to: 'users/registrations#update', as: 'user_registration'
+    delete 'users', to: 'users/registrations#destroy'
+  end
   # Defines the root path route ("/")
   root "dashboard#index"
 
