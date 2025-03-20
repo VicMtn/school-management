@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users, skip: [:registrations]
   # Defines the root path route ("/")
   root "dashboard#index"
 
