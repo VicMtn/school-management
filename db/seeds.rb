@@ -1,8 +1,6 @@
-
-
 # Cleaning database
 puts "Cleaning database..."
-[Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass].each do |model|
+[Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass, User].each do |model|
   model.delete_all
 end
 
@@ -78,7 +76,12 @@ deans = [
     phone_number: "0612345678",
     iban: "FR7630006000011234567890189",
     status: active_status,
-    address: addresses[0]
+    address: addresses[0],
+    user: User.create!(
+      email: "jean.dupont@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Dean.create!(
     username: "dean2",
@@ -88,7 +91,12 @@ deans = [
     phone_number: "0623456789",
     iban: "FR7630006000011234567890188",
     status: active_status,
-    address: addresses[1]
+    address: addresses[1],
+    user: User.create!(
+      email: "marie.martin@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   )
 ]
 
@@ -103,7 +111,12 @@ teachers = [
     phone_number: "0634567890",
     iban: "FR7630006000011234567890187",
     status: active_status,
-    address: addresses[2]
+    address: addresses[2],
+    user: User.create!(
+      email: "pierre.durand@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Teacher.create!(
     username: "teacher2",
@@ -113,7 +126,12 @@ teachers = [
     phone_number: "0645678901",
     iban: "FR7630006000011234567890186",
     status: active_status,
-    address: addresses[3]
+    address: addresses[3],
+    user: User.create!(
+      email: "sophie.petit@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Teacher.create!(
     username: "teacher3",
@@ -123,7 +141,12 @@ teachers = [
     phone_number: "0656789012",
     iban: "FR7630006000011234567890185",
     status: active_status,
-    address: addresses[4]
+    address: addresses[4],
+    user: User.create!(
+      email: "lucas.bernard@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   )
 ]
 
@@ -194,7 +217,12 @@ students = [
     phone_number: "0656789012",
     iban: "FR7630006000011234567890185",
     status: active_status,
-    address: addresses[5]
+    address: addresses[5],
+    user: User.create!(
+      email: "lucas.moreau@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student2",
@@ -204,7 +232,12 @@ students = [
     phone_number: "0667890123",
     iban: "FR7630006000011234567890184",
     status: active_status,
-    address: addresses[6]
+    address: addresses[6],
+    user: User.create!(
+      email: "emma.laurent@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student3",
@@ -214,7 +247,12 @@ students = [
     phone_number: "0678901234",
     iban: "FR7630006000011234567890183",
     status: active_status,
-    address: addresses[7]
+    address: addresses[7],
+    user: User.create!(
+      email: "hugo.simon@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student4",
@@ -224,7 +262,12 @@ students = [
     phone_number: "0689012345",
     iban: "FR7630006000011234567890182",
     status: active_status,
-    address: addresses[8]
+    address: addresses[8],
+    user: User.create!(
+      email: "lea.michel@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student5",
@@ -234,7 +277,12 @@ students = [
     phone_number: "0690123456",
     iban: "FR7630006000011234567890181",
     status: active_status,
-    address: addresses[9]
+    address: addresses[9],
+    user: User.create!(
+      email: "arthur.dubois@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student6",
@@ -244,7 +292,12 @@ students = [
     phone_number: "0611234567",
     iban: "FR7630006000011234567890180",
     status: active_status,
-    address: addresses[10]
+    address: addresses[10],
+    user: User.create!(
+      email: "chloe.robert@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student7",
@@ -254,7 +307,12 @@ students = [
     phone_number: "0622345678",
     iban: "FR7630006000011234567890179",
     status: active_status,
-    address: addresses[11]
+    address: addresses[11],
+    user: User.create!(
+      email: "louis.richard@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student8",
@@ -264,7 +322,12 @@ students = [
     phone_number: "0633456789",
     iban: "FR7630006000011234567890178",
     status: active_status,
-    address: addresses[12]
+    address: addresses[12],
+    user: User.create!(
+      email: "jade.petit@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student9",
@@ -274,7 +337,12 @@ students = [
     phone_number: "0644567890",
     iban: "FR7630006000011234567890177",
     status: active_status,
-    address: addresses[13]
+    address: addresses[13],
+    user: User.create!(
+      email: "gabriel.durand@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student10",
@@ -284,7 +352,12 @@ students = [
     phone_number: "0655678901",
     iban: "FR7630006000011234567890176",
     status: active_status,
-    address: addresses[14]
+    address: addresses[14],
+    user: User.create!(
+      email: "rose.leroy@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student11",
@@ -294,7 +367,12 @@ students = [
     phone_number: "0666789012",
     iban: "FR7630006000011234567890175",
     status: active_status,
-    address: addresses[15]
+    address: addresses[15],
+    user: User.create!(
+      email: "raphael.morel@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student12",
@@ -304,7 +382,12 @@ students = [
     phone_number: "0677890123",
     iban: "FR7630006000011234567890174",
     status: active_status,
-    address: addresses[16]
+    address: addresses[16],
+    user: User.create!(
+      email: "alice.fournier@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student13",
@@ -314,7 +397,12 @@ students = [
     phone_number: "0688901234",
     iban: "FR7630006000011234567890173",
     status: active_status,
-    address: addresses[17]
+    address: addresses[17],
+    user: User.create!(
+      email: "adam.girard@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student14",
@@ -324,7 +412,12 @@ students = [
     phone_number: "0699012345",
     iban: "FR7630006000011234567890172",
     status: active_status,
-    address: addresses[18]
+    address: addresses[18],
+    user: User.create!(
+      email: "lina.bonnet@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   ),
   Student.create!(
     username: "student15",
@@ -334,7 +427,12 @@ students = [
     phone_number: "0610123456",
     iban: "FR7630006000011234567890171",
     status: active_status,
-    address: addresses[19]
+    address: addresses[19],
+    user: User.create!(
+      email: "noah.dupuis@school.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
   )
 ]
 
