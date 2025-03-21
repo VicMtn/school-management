@@ -46,8 +46,12 @@
   <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
+      <% if @active_tab == "promotion_asserts" %>
+        <h2 class="text-base font-semibold leading-6 text-gray-900">Promotion Rules</h2>
+      <% else %>
         <h2 class="text-base font-semibold leading-6 text-gray-900"><%= @active_tab.titleize %></h2>
-        <p class="mt-2 text-sm text-gray-700">A list of all <%= @active_tab %> in the system.</p>
+      <% end %>
+        <p class="mt-2 text-sm text-gray-700">Here are all the <%= @active_tab == "promotion_asserts" ? "promotion rules" : @active_tab %> in ROR Intranet</p>
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
         <%= link_to "New #{@active_tab.singularize.titleize}", 
