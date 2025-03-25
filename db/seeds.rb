@@ -72,39 +72,79 @@ moments = [current_moment, previous_moment, older_moment]
 # Create deans
 puts "Creating deans..."
 deans = []
-2.times do |i|
-  deans << Dean.create!(
-    username: "dean#{i+1}",
-    firstname: Faker::Name.first_name,
-    lastname: Faker::Name.last_name,
-    email: Faker::Internet.unique.email(domain: 'school.com'),
-    phone_number: Faker::PhoneNumber.cell_phone,
-    iban: Faker::Bank.iban(country_code: 'CH'),
-    status: active_status,
-    address: addresses[i],
-    user: User.create!(
-      email: Faker::Internet.unique.email(domain: 'school.com'),
-      password: "password123",
-      password_confirmation: "password123"
-    )
+
+# Créer un premier doyen avec des identifiants connus
+fixed_dean_email = "dean@school.com"
+deans << Dean.create!(
+  username: "dean1",
+  firstname: "John",
+  lastname: "Director",
+  email: fixed_dean_email,
+  phone_number: "0791234567",
+  iban: "CH9300762011623852957",
+  status: active_status,
+  address: addresses[0],
+  user: User.create!(
+    email: fixed_dean_email,
+    password: "password123",
+    password_confirmation: "password123"
   )
-end
+)
+
+# Créer le deuxième doyen
+email = Faker::Internet.unique.email(domain: 'school.com')
+deans << Dean.create!(
+  username: "dean2",
+  firstname: Faker::Name.first_name,
+  lastname: Faker::Name.last_name,
+  email: email,
+  phone_number: Faker::PhoneNumber.cell_phone,
+  iban: Faker::Bank.iban(country_code: 'CH'),
+  status: active_status,
+  address: addresses[1],
+  user: User.create!(
+    email: email,
+    password: "password123",
+    password_confirmation: "password123"
+  )
+)
 
 # Create teachers
 puts "Creating teachers..."
 teachers = []
-10.times do |i|
+
+# Créer un enseignant avec des identifiants connus
+fixed_teacher_email = "teacher@school.com"
+teachers << Teacher.create!(
+  username: "teacher1",
+  firstname: "Robert",
+  lastname: "Smith",
+  email: fixed_teacher_email,
+  phone_number: "0792345678",
+  iban: "CH9300762011623852958",
+  status: active_status,
+  address: addresses[2],
+  user: User.create!(
+    email: fixed_teacher_email,
+    password: "password123",
+    password_confirmation: "password123"
+  )
+)
+
+# Créer les autres enseignants
+9.times do |i|
+  email = Faker::Internet.unique.email(domain: 'school.com')
   teachers << Teacher.create!(
-    username: "teacher#{i+1}",
+    username: "teacher#{i+2}",
     firstname: Faker::Name.first_name,
     lastname: Faker::Name.last_name,
-    email: Faker::Internet.unique.email(domain: 'school.com'),
+    email: email,
     phone_number: Faker::PhoneNumber.cell_phone,
     iban: Faker::Bank.iban(country_code: 'CH'),
     status: active_status,
     address: addresses[i+4],
     user: User.create!(
-      email: Faker::Internet.unique.email(domain: 'school.com'),
+      email: email,
       password: "password123",
       password_confirmation: "password123"
     )
@@ -165,18 +205,39 @@ end
 # Create students
 puts "Creating students..."
 students = []
-40.times do |i|
+
+# Créer un étudiant avec des identifiants connus
+fixed_student_email = "student@school.com"
+students << Student.create!(
+  username: "student1",
+  firstname: "Alice",
+  lastname: "Johnson",
+  email: fixed_student_email,
+  phone_number: "0793456789",
+  iban: "CH9300762011623852959",
+  status: active_status,
+  address: addresses[3],
+  user: User.create!(
+    email: fixed_student_email,
+    password: "password123",
+    password_confirmation: "password123"
+  )
+)
+
+# Créer les autres étudiants
+39.times do |i|
+  email = Faker::Internet.unique.email(domain: 'school.com')
   students << Student.create!(
-    username: "student#{i+1}",
+    username: "student#{i+2}",
     firstname: Faker::Name.first_name,
     lastname: Faker::Name.last_name,
-    email: Faker::Internet.unique.email(domain: 'school.com'),
+    email: email,
     phone_number: Faker::PhoneNumber.cell_phone,
     iban: Faker::Bank.iban(country_code: 'CH'),
     status: active_status,
-    address: addresses[i % addresses.size],
+    address: addresses[(i+4) % addresses.size],
     user: User.create!(
-      email: Faker::Internet.unique.email(domain: 'school.com'),
+      email: email,
       password: "password123",
       password_confirmation: "password123"
     )
