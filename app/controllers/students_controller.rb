@@ -3,12 +3,12 @@ class StudentsController < ApplicationController
   before_action :set_student, only: [:show, :edit, :update, :destroy]
 
   def index
-    @students = Student.all.includes(:user)
+    @students = Student.all.includes(:user, :school_classes, :school_classes => :moment)
     
     if params[:query].present?
       @students = Student.where("firstname LIKE :query OR lastname LIKE :query", 
                               query: "%#{params[:query]}%")
-                        .includes(:user)
+                        .includes(:user, :school_classes, :school_classes => :moment)
     end
   end
 
