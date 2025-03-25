@@ -24,7 +24,6 @@
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= person.type %></td>
               <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                 <%= link_to "Edit", edit_person_path(person), class: "text-blue-600 hover:text-blue-900" %>
-                <%= link_to "Delete", person_path(person), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "ml-3 text-red-600 hover:text-red-900" %>
               </td>
             </tr>
           <% end %>
