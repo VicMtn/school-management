@@ -1,9 +1,14 @@
 class GradesController < ApplicationController
-  before_action :set_grade, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
+  before_action :set_grade, only: [:show, :edit, :update, :destroy]
 
   # GET /grades or /grades.json
   def index
-    @grades = Grade.all
+    if user_signed_in? && current_user.person&.type == 'Student'
+      @grades = current_user.person.grades.includes(:examination).order(execution_date: :desc)
+    else
+      @grades = Grade.all.includes(:student, :examination).order(execution_date: :desc)
+    end
   end
 
   # GET /grades/1 or /grades/1.json
@@ -23,48 +28,36 @@ class GradesController < ApplicationController
   def create
     @grade = Grade.new(grade_params)
 
-    respond_to do |format|
-      if @grade.save
-        format.html { redirect_to @grade, notice: "Grade was successfully created." }
-        format.json { render :show, status: :created, location: @grade }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @grade.errors, status: :unprocessable_entity }
-      end
+    if @grade.save
+      redirect_to @grade, notice: 'Grade was successfully created.'
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /grades/1 or /grades/1.json
   def update
-    respond_to do |format|
-      if @grade.update(grade_params)
-        format.html { redirect_to @grade, notice: "Grade was successfully updated." }
-        format.json { render :show, status: :ok, location: @grade }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @grade.errors, status: :unprocessable_entity }
-      end
+    if @grade.update(grade_params)
+      redirect_to @grade, notice: 'Grade was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /grades/1 or /grades/1.json
   def destroy
-    @grade.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to grades_path, status: :see_other, notice: "Grade was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    @grade.destroy
+    redirect_to grades_url, notice: 'Grade was successfully destroyed.'
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_grade
-      @grade = Grade.find(params.expect(:id))
+      @grade = Grade.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def grade_params
-      params.expect(grade: [ :value, :execute_on, :examination_id, :student_id ])
+      params.require(:grade).permit(:score, :execution_date, :student_id, :examination_id)
     end
 end
