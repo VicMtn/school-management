@@ -47,8 +47,8 @@ class CoursesController < ApplicationController
 
   # DELETE /courses/1 or /courses/1.json
   def destroy
-    @course.destroy
-    redirect_to courses_url, notice: 'Course was successfully destroyed.'
+    @course.soft_delete
+    redirect_to courses_url, notice: 'Course was successfully archived.'
   end
 
   private

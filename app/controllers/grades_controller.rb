@@ -46,8 +46,8 @@ class GradesController < ApplicationController
 
   # DELETE /grades/1 or /grades/1.json
   def destroy
-    @grade.destroy
-    redirect_to grades_url, notice: 'Grade was successfully destroyed.'
+    @grade.soft_delete
+    redirect_to grades_url, notice: 'Grade was successfully archived.'
   end
 
   private

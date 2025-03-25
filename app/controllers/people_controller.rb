@@ -49,10 +49,10 @@ class PeopleController < ApplicationController
 
   # DELETE /people/1 or /people/1.json
   def destroy
-    @person.destroy!
+    @person.soft_delete
 
     respond_to do |format|
-      format.html { redirect_to people_path, status: :see_other, notice: "Person was successfully destroyed." }
+      format.html { redirect_to people_path, status: :see_other, notice: "Person was successfully archived." }
       format.json { head :no_content }
     end
   end
@@ -60,11 +60,11 @@ class PeopleController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_person
-      @person = Person.find(params.expect(:id))
+      @person = Person.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def person_params
-      params.expect(person: [ :username, :lastname, :firstname, :email, :phone_number, :iban, :role, :status_id, :address_id ])
+      params.require(:person).permit(:username, :lastname, :firstname, :email, :phone_number, :iban, :role, :status_id, :address_id)
     end
 end

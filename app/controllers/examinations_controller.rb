@@ -49,10 +49,10 @@ class ExaminationsController < ApplicationController
 
   # DELETE /examinations/1 or /examinations/1.json
   def destroy
-    @examination.destroy!
+    @examination.soft_delete
 
     respond_to do |format|
-      format.html { redirect_to examinations_path, status: :see_other, notice: "Examination was successfully destroyed." }
+      format.html { redirect_to examinations_path, status: :see_other, notice: "Examination was successfully archived." }
       format.json { head :no_content }
     end
   end
@@ -60,11 +60,11 @@ class ExaminationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_examination
-      @examination = Examination.find(params.expect(:id))
+      @examination = Examination.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def examination_params
-      params.expect(examination: [ :title, :effective_date, :course_id ])
+      params.require(:examination).permit(:title, :effective_date, :course_id)
     end
 end
