@@ -16,7 +16,11 @@ Rails.application.routes.draw do
   end
 
   resources :people, concerns: :admin_accessible
-  resources :students
+  resources :students do
+    member do
+      patch :archive
+    end
+  end
   resources :teachers
   resources :deans
   resources :courses
