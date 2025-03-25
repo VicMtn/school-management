@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   resources :promotion_asserts
 
   namespace :admin do
-    root to: 'dashboard#index'
+    root to: 'dashboard#index', as: :root
   end
 
   # Defines the root path route ("/")
