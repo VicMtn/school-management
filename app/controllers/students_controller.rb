@@ -3,12 +3,17 @@ class StudentsController < ApplicationController
   before_action :set_student, only: [:show, :edit, :update, :destroy]
 
   def index
-    @students = Student.all.includes(:user, :school_classes, :school_classes => :moment)
+    @students = Student.includes(:user, :school_classes => [:moment, :master])
     
     if params[:query].present?
       @students = Student.where("firstname LIKE :query OR lastname LIKE :query", 
                               query: "%#{params[:query]}%")
-                        .includes(:user, :school_classes, :school_classes => :moment)
+                        .includes(:user, :school_classes => [:moment, :master])
+    end
+    
+    # Préchargement explicite des données pour le debugging
+    @students.each do |student|
+      student.debug_class_info  # Cette méthode ne fait rien mais force le préchargement
     end
   end
 
