@@ -1,0 +1,338 @@
+<% content_for :title, "Edit Teacher" %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-xl font-semibold text-gray-900">Edit Teacher</h1>
+      <p class="mt-2 text-sm text-gray-700">Update teacher information.</p>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <%= form_with(model: @teacher, class: "space-y-8") do |f| %>
+      <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Personal Information</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Update the teacher's personal details and contact information.</p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-3">
+              <%= f.label :firstname, class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1">
+                <%= f.text_field :firstname, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3" %>
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <%= f.label :lastname, class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1">
+                <%= f.text_field :lastname, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3" %>
+              </div>
+            </div>
+
+            <div class="sm:col-span-4">
+              <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1">
+                <%= f.email_field :email, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3" %>
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <%= f.label :phone_number, class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1">
+                <%= f.text_field :phone_number, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3" %>
+              </div>
+            </div>
+
+            <div class="sm:col-span-4">
+              <%= f.label :iban, class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1">
+                <%= f.text_field :iban, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Teaching Assignments</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Select the subjects and classes for this teacher.</p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-3">
+              <%= f.label :subject_ids, "Subjects", class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1 relative" data-controller="dropdown">
+                <button type="button" 
+                        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6"
+                        data-action="click->dropdown#toggle">
+                  <span class="block truncate">Select subjects</span>
+                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                </button>
+                <div class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden" 
+                     data-dropdown-target="menu">
+                  <% @subjects.each do |subject| %>
+                    <div class="relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-100" 
+                         data-action="click->dropdown#selectItem"
+                         data-id="<%= subject.id %>"
+                         data-name="<%= subject.name %>">
+                      <div class="flex items-center">
+                        <% if @teacher.subjects.include?(subject) %>
+                          <span class="text-blue-600 absolute inset-y-0 left-0 flex items-center pl-3">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                            </svg>
+                          </span>
+                        <% end %>
+                        <span class="font-normal block truncate <%= @teacher.subjects.include?(subject) ? 'pl-8 font-semibold' : '' %>">
+                          <%= subject.name %>
+                        </span>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <% @teacher.subjects.each do |subject| %>
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                      <%= subject.name %>
+                      <%= link_to "×", "#", 
+                          class: "ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:bg-blue-500 focus:text-white focus:outline-none",
+                          data: { 
+                            action: "click->dropdown#remove",
+                            id: subject.id,
+                            confirm: "Are you sure you want to remove this subject?"
+                          } %>
+                      <%= hidden_field_tag "teacher[subject_ids][]", subject.id %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <%= f.label :school_class_ids, "Classes", class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1 relative" data-controller="dropdown">
+                <button type="button" 
+                        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6"
+                        data-action="click->dropdown#toggle">
+                  <span class="block truncate">Select classes</span>
+                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                </button>
+                <div class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden" 
+                     data-dropdown-target="menu">
+                  <% @school_classes.each do |school_class| %>
+                    <div class="relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-100" 
+                         data-action="click->dropdown#selectItem"
+                         data-id="<%= school_class.id %>"
+                         data-name="<%= school_class.name %>"
+                         data-description="<%= "#{school_class.moment&.start_on&.year}, #{school_class.moment&.uid}" %>">
+                      <div class="flex items-center">
+                        <% if @teacher.school_classes.include?(school_class) %>
+                          <span class="text-blue-600 absolute inset-y-0 left-0 flex items-center pl-3">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                            </svg>
+                          </span>
+                        <% end %>
+                        <div class="<%= @teacher.school_classes.include?(school_class) ? 'pl-8' : '' %>">
+                          <span class="font-normal block truncate <%= @teacher.school_classes.include?(school_class) ? 'font-semibold' : '' %>">
+                            <%= school_class.name %>
+                          </span>
+                          <span class="text-gray-500 text-xs">
+                            Academic year: <%= school_class.moment&.start_on&.year %>, Semester: <%= school_class.moment&.uid %>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <% @teacher.school_classes.each do |school_class| %>
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                      <%= school_class.name %>
+                      <span class="text-gray-500 text-xs ml-1">
+                        (<%= school_class.moment&.start_on&.year %>, <%= school_class.moment&.uid %>)
+                      </span>
+                      <%= link_to "×", "#", 
+                          class: "ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:bg-blue-500 focus:text-white focus:outline-none",
+                          data: { 
+                            action: "click->dropdown#remove",
+                            id: school_class.id,
+                            confirm: "Are you sure you want to remove this class?"
+                          } %>
+                      <%= hidden_field_tag "teacher[school_class_ids][]", school_class.id %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <%= link_to "Cancel", teacher_path(@teacher), class: "rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
+        <%= f.submit "Update Teacher", class: "inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    class DropdownController {
+      static targets = ['menu']
+      
+      connect() {
+        this.closeListener = this.close.bind(this)
+        document.addEventListener('click', this.closeListener)
+      }
+      
+      disconnect() {
+        document.removeEventListener('click', this.closeListener)
+      }
+      
+      toggle(event) {
+        event.stopPropagation()
+        const menu = this.menuTarget
+        menu.classList.toggle('hidden')
+      }
+      
+      close(event) {
+        if (!this.element.contains(event.target)) {
+          this.menuTarget.classList.add('hidden')
+        }
+      }
+      
+      selectItem(event) {
+        event.preventDefault()
+        const id = event.currentTarget.dataset.id
+        const name = event.currentTarget.dataset.name
+        const description = event.currentTarget.dataset.description
+        
+        // Check if item already exists
+        const existingItem = this.element.querySelector(`input[value="${id}"]`)
+        if (existingItem) {
+          // Remove it if it exists
+          this.removeItem(id)
+        } else {
+          // Add it if it doesn't exist
+          this.addItem(id, name, description)
+        }
+        
+        // Toggle the menu
+        this.menuTarget.classList.add('hidden')
+      }
+      
+      addItem(id, name, description) {
+        const container = this.element.querySelector('.flex-wrap')
+        
+        const item = document.createElement('span')
+        item.className = 'inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10'
+        
+        const text = document.createTextNode(name)
+        item.appendChild(text)
+        
+        // Add description if available (for classes)
+        if (description) {
+          const descriptionSpan = document.createElement('span')
+          descriptionSpan.className = 'text-gray-500 text-xs ml-1'
+          descriptionSpan.textContent = `(${description})`
+          item.appendChild(descriptionSpan)
+        }
+        
+        const removeLink = document.createElement('a')
+        removeLink.href = '#'
+        removeLink.className = 'ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:bg-blue-500 focus:text-white focus:outline-none'
+        removeLink.dataset.action = 'click->dropdown#remove'
+        removeLink.dataset.id = id
+        removeLink.dataset.confirm = this.element.querySelector('label').textContent.includes('Classes') 
+          ? 'Are you sure you want to remove this class?' 
+          : 'Are you sure you want to remove this subject?'
+        removeLink.textContent = '×'
+        
+        const hiddenField = document.createElement('input')
+        hiddenField.type = 'hidden'
+        hiddenField.name = this.element.querySelector('label').textContent.includes('Classes') 
+          ? 'teacher[school_class_ids][]' 
+          : 'teacher[subject_ids][]'
+        hiddenField.value = id
+        
+        item.appendChild(removeLink)
+        item.appendChild(hiddenField)
+        container.appendChild(item)
+        
+        // Update checkbox in dropdown
+        const dropdownItem = this.menuTarget.querySelector(`[data-id="${id}"]`)
+        if (dropdownItem) {
+          const checkbox = dropdownItem.querySelector('.text-blue-600')
+          if (!checkbox) {
+            const checkIcon = document.createElement('span')
+            checkIcon.className = 'text-blue-600 absolute inset-y-0 left-0 flex items-center pl-3'
+            checkIcon.innerHTML = '<svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" /></svg>'
+            dropdownItem.querySelector('.flex').prepend(checkIcon)
+            
+            const contentContainer = dropdownItem.querySelector('.flex div, .font-normal')
+            if (contentContainer) {
+              contentContainer.classList.add('pl-8')
+              const nameSpan = contentContainer.querySelector('span:first-child') || contentContainer
+              nameSpan.classList.add('font-semibold')
+            }
+          }
+        }
+      }
+      
+      remove(event) {
+        event.preventDefault()
+        const id = event.currentTarget.dataset.id
+        
+        if (confirm(event.currentTarget.dataset.confirm)) {
+          this.removeItem(id)
+        }
+      }
+      
+      removeItem(id) {
+        // Remove the tag
+        const container = this.element.querySelector('.flex-wrap')
+        const item = container.querySelector(`input[value="${id}"]`).parentNode
+        container.removeChild(item)
+        
+        // Update checkbox in dropdown
+        const dropdownItem = this.menuTarget.querySelector(`[data-id="${id}"]`)
+        if (dropdownItem) {
+          const checkbox = dropdownItem.querySelector('.text-blue-600')
+          if (checkbox) {
+            checkbox.remove()
+            
+            const contentContainer = dropdownItem.querySelector('.flex div, .font-normal')
+            if (contentContainer) {
+              contentContainer.classList.remove('pl-8')
+              const nameSpan = contentContainer.querySelector('span:first-child') || contentContainer
+              nameSpan.classList.remove('font-semibold')
+            }
+          }
+        }
+      }
+    }
+    
+    window.DropdownController = DropdownController
+    
+    // Register the controller
+    if (typeof Stimulus !== 'undefined') {
+      const application = Stimulus.application || new Stimulus.Application()
+      application.register('dropdown', DropdownController)
+    }
+  })
+</script> 

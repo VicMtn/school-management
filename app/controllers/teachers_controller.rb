@@ -13,9 +13,13 @@ class TeachersController < ApplicationController
 
   def new
     @teacher = Teacher.new
+    @subjects = Subject.all
+    @school_classes = SchoolClass.includes(:moment).all
   end
 
   def edit
+    @subjects = Subject.all
+    @school_classes = SchoolClass.includes(:moment).all
   end
 
   def create
