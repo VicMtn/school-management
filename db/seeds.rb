@@ -191,15 +191,32 @@ class_names = [
   { uid: "2B", name: "Second Year B" }
 ]
 
+# Select which teachers will be masters (just use the first 2)
+master_teachers = teachers[0..1]
+
 class_names.each_with_index do |class_data, i|
-  school_classes << SchoolClass.create!(
-    uid: class_data[:uid],
-    name: class_data[:name],
-    moment: current_moment,
-    room: rooms[i],
-    sector: sectors[i % sectors.size],
-    master: i < 2 ? deans[i] : teachers[i-2]
-  )
+  if i < 2
+    # Assign first two classes to deans
+    school_classes << SchoolClass.create!(
+      uid: class_data[:uid],
+      name: class_data[:name],
+      moment: current_moment,
+      room: rooms[i],
+      sector: sectors[i % sectors.size],
+      master: deans[i]
+    )
+  else
+    # Assign remaining classes to selected teachers
+    teacher_index = i - 2  # adjust index to start at 0 for teachers
+    school_classes << SchoolClass.create!(
+      uid: class_data[:uid],
+      name: class_data[:name],
+      moment: current_moment,
+      room: rooms[i],
+      sector: sectors[i % sectors.size],
+      master: master_teachers[teacher_index]
+    )
+  end
 end
 
 # Create students
@@ -244,8 +261,9 @@ students << Student.create!(
   )
 end
 
-# Associate students with classes
+# Associate students with classes - make sure all students have a class
 puts "Associating students with classes..."
+# Ensure every student is assigned to a class
 # Distribute students evenly among the classes
 students.each_with_index do |student, i|
   StudentsClass.create!(student: student, school_class: school_classes[i % school_classes.size])
@@ -378,7 +396,14 @@ school_classes.each do |school_class|
   puts "#{school_class.name} : #{school_class.students_classes.count} students"
 end
 
-puts "Number of courses per teacher :"
+puts "Class masters:"
+school_classes.each do |school_class|
+  master = school_class.master
+  master_type = master.is_a?(Dean) ? "Dean" : "Teacher"
+  puts "- #{school_class.name} : Master is #{master.full_name} (#{master_type})"
+end
+
+puts "Number of courses per teacher:"
 teachers.each do |teacher|
   puts "- #{teacher.full_name} : #{teacher.courses.count} courses"
 end
