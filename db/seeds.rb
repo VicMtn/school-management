@@ -445,6 +445,9 @@ students[8..14].each do |student|
   StudentsClass.create!(student: student, school_class: school_classes[1])
 end
 
+# Load the courses seeder
+require_relative 'seeds/courses'
+
 # Create courses
 puts "Creating courses..."
 courses = [
