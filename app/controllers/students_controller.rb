@@ -13,6 +13,8 @@ class StudentsController < ApplicationController
   end
 
   def show
+    @student = Student.includes(:user, :school_classes, :school_classes => [:moment, :master], 
+                              :grades => [:examination => [:course => :subject]]).find(params[:id])
   end
 
   def new
@@ -52,6 +54,6 @@ class StudentsController < ApplicationController
   end
 
   def student_params
-    params.require(:student).permit(:firstname, :lastname, :birthdate, :gender, :address_id, :school_class_id)
+    params.require(:student).permit(:firstname, :lastname, :address_id, :school_class_id)
   end
 end 
