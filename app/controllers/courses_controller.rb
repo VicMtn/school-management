@@ -1,10 +1,15 @@
 class CoursesController < ApplicationController
-  before_action :set_course, only: %i[ show edit update destroy ]
-  before_action :require_admin, except: [:index, :show]
+  before_action :authenticate_user!
+  before_action :set_course, only: [:show, :edit, :update, :destroy]
 
   # GET /courses or /courses.json
   def index
-    @courses = Course.all
+    if user_signed_in? && current_user.person&.type == 'Student'
+      @current_class = current_user.person.current_class
+      @courses = @current_class.courses.includes(:subject, :teacher).order(:start_at)
+    else
+      @courses = Course.all.includes(:subject, :teacher, :school_class).order(:start_at)
+    end
   end
 
   # GET /courses/1 or /courses/1.json
@@ -25,7 +30,7 @@ class CoursesController < ApplicationController
     @course = Course.new(course_params)
 
     if @course.save
-      redirect_to courses_path, notice: 'Course was successfully created.'
+      redirect_to @course, notice: 'Course was successfully created.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -34,7 +39,7 @@ class CoursesController < ApplicationController
   # PATCH/PUT /courses/1 or /courses/1.json
   def update
     if @course.update(course_params)
-      redirect_to courses_path, notice: 'Course was successfully updated.'
+      redirect_to @course, notice: 'Course was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -43,7 +48,7 @@ class CoursesController < ApplicationController
   # DELETE /courses/1 or /courses/1.json
   def destroy
     @course.destroy
-    redirect_to courses_path, notice: 'Course was successfully deleted.'
+    redirect_to courses_url, notice: 'Course was successfully destroyed.'
   end
 
   private
@@ -54,6 +59,6 @@ class CoursesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def course_params
-      params.require(:course).permit(:name, :description)
+      params.require(:course).permit(:start_at, :end_at, :archived, :subject_id, :school_class_id, :moment_id, :teacher_id)
     end
 end
