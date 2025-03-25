@@ -3,16 +3,12 @@ class TeachersController < ApplicationController
   before_action :set_teacher, only: [:show, :edit, :update, :destroy]
 
   def index
-    @teachers = Teacher.all.includes(:user, :school_classes, :school_classes => :moment)
-    
-    if params[:query].present?
-      @teachers = Teacher.where("firstname LIKE :query OR lastname LIKE :query", 
-                              query: "%#{params[:query]}%")
-                        .includes(:user, :school_classes, :school_classes => :moment)
-    end
+    @teachers = Teacher.includes(:user, :school_classes, :school_classes => :moment)
+    @teachers = @teachers.where("users.firstname LIKE ? OR users.lastname LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%") if params[:query].present?
   end
 
   def show
+    @teacher = Teacher.includes(:user, :school_classes, [:school_classes => :moment]).find(params[:id])
   end
 
   def new
@@ -24,7 +20,6 @@ class TeachersController < ApplicationController
 
   def create
     @teacher = Teacher.new(teacher_params)
-
     if @teacher.save
       redirect_to @teacher, notice: 'Teacher was successfully created.'
     else
@@ -41,8 +36,8 @@ class TeachersController < ApplicationController
   end
 
   def destroy
-    @teacher.soft_delete
-    redirect_to teachers_url, notice: 'Teacher was successfully archived.'
+    @teacher.destroy
+    redirect_to teachers_url, notice: 'Teacher was successfully deleted.'
   end
 
   private
@@ -52,6 +47,6 @@ class TeachersController < ApplicationController
   end
 
   def teacher_params
-    params.require(:teacher).permit(:firstname, :lastname, :birthdate, :gender, :address_id)
+    params.require(:teacher).permit(:firstname, :lastname, :email, :phone_number, :iban)
   end
 end 
