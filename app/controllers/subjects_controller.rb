@@ -18,10 +18,12 @@ class SubjectsController < ApplicationController
   # GET /subjects/new
   def new
     @subject = Subject.new
+    load_teachers
   end
 
   # GET /subjects/1/edit
   def edit
+    load_teachers
   end
 
   # POST /subjects or /subjects.json
@@ -31,6 +33,7 @@ class SubjectsController < ApplicationController
     if @subject.save
       redirect_to subjects_path, notice: 'Subject was successfully created.'
     else
+      load_teachers
       render :new, status: :unprocessable_entity
     end
   end
@@ -40,6 +43,7 @@ class SubjectsController < ApplicationController
     if @subject.update(subject_params)
       redirect_to subjects_path, notice: 'Subject was successfully updated.'
     else
+      load_teachers
       render :edit, status: :unprocessable_entity
     end
   end
@@ -64,6 +68,10 @@ class SubjectsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def subject_params
-      params.require(:subject).permit(:name, :description, :course_id)
+      params.require(:subject).permit(:name, :slug, :teacher_id)
+    end
+    
+    def load_teachers
+      @teachers = Teacher.all.order(:lastname, :firstname)
     end
 end
