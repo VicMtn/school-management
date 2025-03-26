@@ -18,17 +18,28 @@
 
   <div class="my-5">
     <%= form.label :function %>
-    <%= form.text_field :function, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": promotion_assert.errors[:function].none?, "border-red-400 focus:outline-red-600": promotion_assert.errors[:function].any?}] %>
+    <%= form.select :function, 
+      options_for_select([
+        ["Average", "average"],
+        ["Minimum", "minimum"],
+        ["Maximum", "maximum"]
+      ], promotion_assert.function),
+      { prompt: "Select a function" },
+      class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": promotion_assert.errors[:function].none?, "border-red-400 focus:outline-red-600": promotion_assert.errors[:function].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :moment_id %>
-    <%= form.text_field :moment_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": promotion_assert.errors[:moment_id].none?, "border-red-400 focus:outline-red-600": promotion_assert.errors[:moment_id].any?}] %>
+    <%= form.collection_select :moment_id, @moments, :id, :uid, 
+      { prompt: "Select a semester" },
+      class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": promotion_assert.errors[:moment_id].none?, "border-red-400 focus:outline-red-600": promotion_assert.errors[:moment_id].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :sector_id %>
-    <%= form.text_field :sector_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": promotion_assert.errors[:sector_id].none?, "border-red-400 focus:outline-red-600": promotion_assert.errors[:sector_id].any?}] %>
+    <%= form.collection_select :sector_id, @sectors, :id, :name,
+      { prompt: "Select a sector" },
+      class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": promotion_assert.errors[:sector_id].none?, "border-red-400 focus:outline-red-600": promotion_assert.errors[:sector_id].any?}] %>
   </div>
 
   <div class="inline">
