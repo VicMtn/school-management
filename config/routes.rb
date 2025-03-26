@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     member do
       patch :archive
       get :grade_report
+      get :promotion_check
     end
   end
   resources :teachers
