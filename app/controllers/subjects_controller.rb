@@ -19,11 +19,13 @@ class SubjectsController < ApplicationController
   def new
     @subject = Subject.new
     load_teachers
+    load_sectors
   end
 
   # GET /subjects/1/edit
   def edit
     load_teachers
+    load_sectors
   end
 
   # POST /subjects or /subjects.json
@@ -34,6 +36,7 @@ class SubjectsController < ApplicationController
       redirect_to subjects_path, notice: 'Subject was successfully created.'
     else
       load_teachers
+      load_sectors
       render :new, status: :unprocessable_entity
     end
   end
@@ -44,6 +47,7 @@ class SubjectsController < ApplicationController
       redirect_to subjects_path, notice: 'Subject was successfully updated.'
     else
       load_teachers
+      load_sectors
       render :edit, status: :unprocessable_entity
     end
   end
@@ -63,15 +67,19 @@ class SubjectsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_subject
-      @subject = Subject.includes(:teacher).find(params[:id])
+      @subject = Subject.includes(:teacher, :sector).find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def subject_params
-      params.require(:subject).permit(:name, :slug, :teacher_id)
+      params.require(:subject).permit(:name, :slug, :teacher_id, :sector_id)
     end
     
     def load_teachers
       @teachers = Teacher.all.order(:lastname, :firstname)
+    end
+    
+    def load_sectors
+      @sectors = Sector.all.order(:name)
     end
 end

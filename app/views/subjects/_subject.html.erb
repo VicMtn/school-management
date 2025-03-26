@@ -11,4 +11,8 @@
     <strong class="block font-medium mb-1">Teacher:</strong>
     <%= subject.teacher&.full_name %>
   </div>
+  <div>
+    <strong class="block font-medium mb-1">Sector:</strong>
+    <%= subject.sector&.name || "Not assigned" %>
+  </div>
 </div>
