@@ -1,4 +1,8 @@
-<% content_for :title, "Showing course" %>
+<% content_for :title, "Course Details" %>
+
+<% unless user_signed_in? && current_user.person&.type == 'Student' %>
+  <%= render "shared/admin_tabs" %>
+<% end %>
 
 <div class="md:w-2/3 w-full">
   <% if notice.present? %>
