@@ -1,18 +1,18 @@
-<% content_for :title, "Edit Teacher" %>
+<% content_for :title, "New Teacher" %>
 
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="mb-8 border-b border-gray-200 pb-5">
     <div class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">Edit Teacher</h1>
-        <p class="mt-1 text-sm text-gray-500">Update teacher information and assignments.</p>
+        <h1 class="text-2xl font-bold text-gray-800">New Teacher</h1>
+        <p class="mt-1 text-sm text-gray-500">Add a new teacher to the school.</p>
       </div>
       <div class="flex items-center space-x-3">
-        <%= link_to teacher_path(@teacher), class: "flex items-center text-sm text-gray-600 hover:text-gray-900", data: { turbo: false } do %>
+        <%= link_to teachers_path, class: "flex items-center text-sm text-gray-600 hover:text-gray-900", data: { turbo: false } do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to Details
+          Back to Teachers List
         <% end %>
       </div>
     </div>
@@ -145,7 +145,7 @@
                 <%= f.check_box :subject_ids, 
                             { multiple: true, class: "h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" }, 
                             subject.id, 
-                            @teacher.subjects.include?(subject) %>
+                            nil %>
                 <%= f.label "subject_ids_#{subject.id}", class: "ml-3 font-medium text-sm text-gray-700" do %>
                   <span class="flex items-center">
                     <span class="w-2 h-2 inline-block mr-2 rounded-full" style="background-color: purple-600"></span>
@@ -183,7 +183,7 @@
                   <%= f.check_box :school_class_ids, 
                               { multiple: true, class: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" }, 
                               school_class.id, 
-                              @teacher.school_classes.include?(school_class) %>
+                              nil %>
                 </div>
                 <div class="ml-3 text-sm">
                   <%= f.label "school_class_ids_#{school_class.id}", class: "font-medium text-gray-700" do %>
@@ -206,112 +206,13 @@
     </div>
 
     <div class="flex justify-end gap-4">
-      <%= link_to "Cancel", teacher_path(@teacher), data: { turbo: false }, class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" %>
+      <%= link_to "Cancel", teachers_path, data: { turbo: false }, class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" %>
       <%= f.button type: "submit", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        Update Teacher
+        Create Teacher
       <% end %>
     </div>
   <% end %>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    class SelectionController {
-      static targets = ['tags']
-      
-      connect() {
-        const select = this.element
-        this.selectElement = select
-        
-        // Initialize select2 on the element
-        if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
-          jQuery(select).select2({
-            placeholder: select.getAttribute('placeholder') || 'Select options',
-            allowClear: true,
-            width: '100%'
-          })
-          
-          // Listen for changes
-          jQuery(select).on('change', this.updateTags.bind(this))
-          
-          // Initial update
-          this.updateTags()
-        } else {
-          console.warn('Select2 is not available')
-          select.addEventListener('change', this.updateTags.bind(this))
-          this.updateTags()
-        }
-      }
-      
-      updateTags() {
-        const select = this.selectElement
-        const tagsContainer = this.tagsTarget
-        tagsContainer.innerHTML = ''
-        
-        const selectedOptions = Array.from(select.selectedOptions)
-        
-        selectedOptions.forEach(option => {
-          const tag = document.createElement('span')
-          tag.className = 'inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10'
-          
-          const name = option.text
-          const id = option.value
-          
-          const displayText = document.createTextNode(name)
-          tag.appendChild(displayText)
-          
-          const removeButton = document.createElement('button')
-          removeButton.type = 'button'
-          removeButton.className = 'ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:bg-blue-500 focus:text-white focus:outline-none'
-          removeButton.textContent = '×'
-          removeButton.onclick = () => this.removeOption(id)
-          
-          tag.appendChild(removeButton)
-          tagsContainer.appendChild(tag)
-        })
-      }
-      
-      removeOption(id) {
-        const select = this.selectElement
-        const option = select.querySelector(`option[value="${id}"]`)
-        
-        if (option) {
-          option.selected = false
-          
-          // Trigger change event for select2
-          if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
-            jQuery(select).trigger('change')
-          } else {
-            const event = new Event('change', { bubbles: true })
-            select.dispatchEvent(event)
-          }
-        }
-      }
-    }
-    
-    // Register controllers
-    if (typeof Stimulus !== 'undefined') {
-      const application = Stimulus.application || new Stimulus.Application()
-      application.register('subject-selection', SelectionController)
-      application.register('class-selection', SelectionController)
-    } else {
-      // Fallback for direct initialization
-      document.querySelectorAll('[data-controller="subject-selection"]').forEach(element => {
-        const controller = new SelectionController()
-        controller.element = element
-        controller.tagsTarget = document.querySelector('[data-subject-selection-target="tags"]')
-        controller.connect()
-      })
-      
-      document.querySelectorAll('[data-controller="class-selection"]').forEach(element => {
-        const controller = new SelectionController()
-        controller.element = element
-        controller.tagsTarget = document.querySelector('[data-class-selection-target="tags"]')
-        controller.connect()
-      })
-    }
-  })
-</script> 
+</div> 
