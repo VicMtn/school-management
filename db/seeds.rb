@@ -1,6 +1,6 @@
 # Cleaning database
 puts "Cleaning database..."
-[Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass, User].each do |model|
+[Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass, User, PromotionAssert].each do |model|
   model.delete_all
 end
 
@@ -154,30 +154,34 @@ end
 # Create subjects
 puts "Creating subjects..."
 subject_data = [
-  { slug: "math", name: "Mathematics" },
-  { slug: "phys", name: "Physics" },
-  { slug: "hist", name: "History" },
-  { slug: "geo", name: "Geography" },
-  { slug: "info", name: "Computer Science" },
-  { slug: "engl", name: "English" },
-  { slug: "biol", name: "Biology" },
-  { slug: "chem", name: "Chemistry" },
-  { slug: "fren", name: "French" },
-  { slug: "germ", name: "German" },
-  { slug: "arts", name: "Arts" },
-  { slug: "musi", name: "Music" },
-  { slug: "phyed", name: "Physical Education" },
-  { slug: "econ", name: "Economics" },
-  { slug: "psyc", name: "Psychology" },
-  { slug: "soci", name: "Sociology" }
+  { slug: "math", name: "Mathematics", sector: "Sciences" },
+  { slug: "phys", name: "Physics", sector: "Sciences" },
+  { slug: "hist", name: "History", sector: "Humanities" },
+  { slug: "geo", name: "Geography", sector: "Humanities" },
+  { slug: "info", name: "Computer Science", sector: "Technology" },
+  { slug: "engl", name: "English", sector: "Languages" },
+  { slug: "biol", name: "Biology", sector: "Sciences" },
+  { slug: "chem", name: "Chemistry", sector: "Sciences" },
+  { slug: "fren", name: "French", sector: "Languages" },
+  { slug: "germ", name: "German", sector: "Languages" },
+  { slug: "arts", name: "Arts", sector: "Arts" },
+  { slug: "musi", name: "Music", sector: "Arts" },
+  { slug: "phyed", name: "Physical Education", sector: "Physical Education" },
+  { slug: "econ", name: "Economics", sector: "Business" },
+  { slug: "psyc", name: "Psychology", sector: "Social Sciences" },
+  { slug: "soci", name: "Sociology", sector: "Social Sciences" }
 ]
 
 subjects = []
 subject_data.each_with_index do |data, i|
+  # Trouver le secteur correspondant
+  sector = sectors.find { |s| s.name == data[:sector] }
+  
   subjects << Subject.create!(
     slug: data[:slug],
     name: data[:name],
-    teacher: teachers[i % teachers.size]
+    teacher: teachers[i % teachers.size],
+    sector: sector
   )
 end
 
@@ -215,6 +219,30 @@ class_names.each_with_index do |class_data, i|
       room: rooms[i],
       sector: sectors[i % sectors.size],
       master: master_teachers[teacher_index]
+    )
+  end
+end
+
+# Create promotion assertions
+puts "Creating promotion assertions..."
+promotion_functions = ["average", "minimum", "maximum"]
+
+# Créer des assertions pour chaque moment (période)
+moments.each do |moment|
+  # Créer une assertion pour chaque secteur principal
+  main_sectors = ["Sciences", "Humanities", "Languages", "Technology"]
+  
+  main_sectors.each_with_index do |sector_name, index|
+    sector = sectors.find { |s| s.name == sector_name }
+    
+    # Choisir une fonction différente pour chaque secteur (pour la variété)
+    function = promotion_functions[index % promotion_functions.size]
+    
+    PromotionAssert.create!(
+      description: "#{function.capitalize} grade for #{sector_name}",
+      function: function,
+      moment: moment,
+      sector: sector
     )
   end
 end
@@ -388,6 +416,7 @@ puts "Students Classes : #{StudentsClass.count}"
 puts "Courses : #{Course.count}"
 puts "Examinations : #{Examination.count}"
 puts "Grades : #{Grade.count}"
+puts "Promotion Assertions : #{PromotionAssert.count}"
 puts "--------------------------------"
 
 puts "\nVerifications of associations :"
@@ -406,6 +435,16 @@ end
 puts "Number of courses per teacher:"
 teachers.each do |teacher|
   puts "- #{teacher.full_name} : #{teacher.courses.count} courses"
+end
+
+puts "Subject sectors:"
+subjects.each do |subject|
+  puts "- #{subject.name} : #{subject.sector&.name || 'No sector'}"
+end
+
+puts "Promotion assertions per moment:"
+moments.each do |moment|
+  puts "- #{moment.uid} : #{PromotionAssert.where(moment: moment).count} assertions"
 end
 puts "--------------------------------"
 
