@@ -33,4 +33,26 @@ class Student < Person
       all_moments: school_classes.map(&:moment).uniq.map { |m| { id: m.id, uid: m.uid, start_on: m.start_on, end_on: m.end_on } }
     }
   end
+  
+  def promoted?(moment = nil)
+    moment ||= current_moment
+    return false unless moment
+    
+    calculator = PromotionCalculatorService.new(self, moment)
+    calculator.promoted?
+  end
+  
+  def promotion_results(moment = nil)
+    moment ||= current_moment
+    return { promoted: false, reason: "No current moment found" } unless moment
+    
+    calculator = PromotionCalculatorService.new(self, moment)
+    calculator.results
+  end
+  
+  private
+  
+  def current_moment
+    current_class&.moment
+  end
 end 
