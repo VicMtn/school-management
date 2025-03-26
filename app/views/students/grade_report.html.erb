@@ -1,0 +1,240 @@
+<% content_for :title, "Bulletin de notes - #{@student.full_name}" %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="py-6">
+    <div class="sm:flex sm:items-center sm:justify-between">
+      <h1 class="text-2xl font-semibold text-gray-900">Bulletin de notes - <%= @student.full_name %></h1>
+      <div class="mt-4 sm:mt-0">
+        <%= link_to "Télécharger en PDF", grade_report_student_path(@student, moment_id: @moment&.id, format: :pdf), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Informations de l'étudiant</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">Détails personnels et académiques.</p>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Nom complet</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @student.full_name %></dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Email</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @student.email %></dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Classe actuelle</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @student.current_class&.name || "Non assigné" %></dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Enseignant responsable</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @student.current_class&.master&.full_name || "Non assigné" %></dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Période de notation</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @moment&.uid || "Non définie" %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Sélectionner une période</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Afficher les notes pour une période spécifique.</p>
+      </div>
+    </div>
+    <div class="border-t border-gray-200 px-4 py-5">
+      <%= form_with(url: grade_report_student_path(@student), method: :get, class: "space-y-4") do |form| %>
+        <div class="sm:flex sm:items-center">
+          <div class="sm:w-1/3">
+            <%= form.label :moment_id, "Période", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.select :moment_id, 
+                           options_from_collection_for_select(Moment.order(start_on: :desc), :id, :uid, @moment&.id),
+                           { include_blank: "Sélectionner une période" },
+                           class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+          <div class="mt-3 sm:mt-0 sm:ml-4">
+            <%= form.submit "Afficher", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @moment %>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Notes</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Période: <%= @moment.uid %></p>
+      </div>
+      <div class="border-t border-gray-200">
+        <% 
+          relevant_grades = @student.grades.joins(examination: { course: :moment })
+                                   .where(courses: { moment_id: @moment.id })
+                                   .includes(examination: { course: [:subject, :teacher] })
+                                   .order(execute_on: :desc)
+        %>
+        
+        <% if relevant_grades.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matière</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Secteur</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Professeur</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Examen</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% relevant_grades.each do |grade| %>
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <%= grade.examination.course.subject.name %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <%= grade.examination.course.subject.sector&.name || "N/A" %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <%= grade.examination.course.teacher&.full_name || "N/A" %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <%= grade.examination.title %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <%= grade.execute_on&.strftime("%d/%m/%Y") || "N/A" %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium <%= grade.value >= 10 ? 'text-green-600' : 'text-red-600' %>">
+                      <%= grade.value %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <% if grade.value >= 10 %>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          Réussi
+                        </span>
+                      <% else %>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          Échec
+                        </span>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="px-6 py-4 text-sm text-gray-500">
+            Aucune note n'a été enregistrée pour cette période.
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @promotion_results.present? %>
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Résultats de promotion</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            Période: <%= @moment.uid %>
+          </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5">
+          <% if @promotion_results[:promoted] %>
+            <div class="rounded-md bg-green-50 p-4 mb-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-green-800">PROMU</h3>
+                  <div class="mt-2 text-sm text-green-700">
+                    <p>L'étudiant est promu dans la classe suivante.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div class="rounded-md bg-red-50 p-4 mb-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-red-800">NON PROMU</h3>
+                  <div class="mt-2 text-sm text-red-700">
+                    <% if @promotion_results[:reason].present? %>
+                      <p>Raison: <%= @promotion_results[:reason] %></p>
+                    <% else %>
+                      <p>L'étudiant n'a pas satisfait toutes les conditions requises pour être promu.</p>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <% if @promotion_results[:sector_results].present? %>
+            <h4 class="text-lg font-medium text-gray-700 mb-4">Détails par secteur</h4>
+            <div class="flex flex-col">
+              <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                  <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-gray-50">
+                        <tr>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Secteur</th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moyenne</th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fonction</th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-white divide-y divide-gray-200">
+                        <% @promotion_results[:sector_results].each do |sector_name, result| %>
+                          <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= sector_name %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <%= result[:grade] ? result[:grade].round(2) : "N/A" %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= result[:function].capitalize %></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              <% if result[:meets_requirement] %>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Réussi</span>
+                              <% else %>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Échec</span>
+                              <% end %>
+                            </td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+          <div class="mt-6">
+            <%= link_to "Voir détails de promotion", promotion_check_student_path(@student, moment_id: @moment.id), class: "text-blue-600 hover:text-blue-900" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="py-4">
+    <%= link_to "Retour", @student, class: "text-blue-600 hover:text-blue-900" %>
+  </div>
+</div> 
