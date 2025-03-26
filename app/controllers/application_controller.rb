@@ -12,14 +12,14 @@ class ApplicationController < ActionController::Base
   end
 
   def require_admin
-    unless current_user&.person&.dean?
-      flash[:error] = "You are not authorized to perform this action."
+    unless current_user&.person&.type == 'Dean'
+      flash[:alert] = "You are not authorized to access this area."
       redirect_to root_path
     end
   end
 
   def admin_area?
-    current_user&.person&.dean?
+    current_user&.person&.type == 'Dean'
   end
   helper_method :admin_area?
 end
