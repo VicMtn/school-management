@@ -19,12 +19,17 @@ Rails.application.routes.draw do
   resources :students do
     member do
       patch :archive
+      get :grade_report
     end
   end
   resources :teachers
   resources :deans
   resources :courses
-  resources :subjects
+  resources :subjects do
+    member do
+      patch :restore
+    end
+  end
   resources :promotion_asserts
 
   namespace :admin do
