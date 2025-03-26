@@ -28,27 +28,38 @@
 
   <div class="my-5">
     <%= form.label :subject_id %>
-    <%= form.text_field :subject_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:subject_id].none?, "border-red-400 focus:outline-red-600": course.errors[:subject_id].any?}] %>
+    <%= form.collection_select :subject_id, @subjects, :id, :name, { prompt: "Select a subject" }, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:subject_id].none?, "border-red-400 focus:outline-red-600": course.errors[:subject_id].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :school_class_id %>
-    <%= form.text_field :school_class_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:school_class_id].none?, "border-red-400 focus:outline-red-600": course.errors[:school_class_id].any?}] %>
+    <%= form.collection_select :school_class_id, @school_classes, :id, :name, { prompt: "Select a class" }, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:school_class_id].none?, "border-red-400 focus:outline-red-600": course.errors[:school_class_id].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :moment_id %>
-    <%= form.text_field :moment_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:moment_id].none?, "border-red-400 focus:outline-red-600": course.errors[:moment_id].any?}] %>
+    <%= form.collection_select :moment_id, @moments, :id, :uid, { prompt: "Select a semester" }, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:moment_id].none?, "border-red-400 focus:outline-red-600": course.errors[:moment_id].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :teacher_id %>
-    <%= form.text_field :teacher_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:teacher_id].none?, "border-red-400 focus:outline-red-600": course.errors[:teacher_id].any?}] %>
+    <%= form.collection_select :teacher_id, @teachers, :id, :full_name, { prompt: "Select a teacher" }, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:teacher_id].none?, "border-red-400 focus:outline-red-600": course.errors[:teacher_id].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :week_day %>
-    <%= form.number_field :week_day, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:week_day].none?, "border-red-400 focus:outline-red-600": course.errors[:week_day].any?}] %>
+    <%= form.select :week_day, 
+      options_for_select([
+        ["Monday", 1],
+        ["Tuesday", 2],
+        ["Wednesday", 3],
+        ["Thursday", 4],
+        ["Friday", 5],
+        ["Saturday", 6],
+        ["Sunday", 0]
+      ], course.week_day),
+      { prompt: "Select a day" },
+      class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": course.errors[:week_day].none?, "border-red-400 focus:outline-red-600": course.errors[:week_day].any?}] %>
   </div>
 
   <div class="inline">

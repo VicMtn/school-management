@@ -20,10 +20,12 @@ class CoursesController < ApplicationController
   # GET /courses/new
   def new
     @course = Course.new
+    load_collections
   end
 
   # GET /courses/1/edit
   def edit
+    load_collections
   end
 
   # POST /courses or /courses.json
@@ -33,6 +35,7 @@ class CoursesController < ApplicationController
     if @course.save
       redirect_to @course, notice: 'Course was successfully created.'
     else
+      load_collections
       render :new, status: :unprocessable_entity
     end
   end
@@ -42,6 +45,7 @@ class CoursesController < ApplicationController
     if @course.update(course_params)
       redirect_to @course, notice: 'Course was successfully updated.'
     else
+      load_collections
       render :edit, status: :unprocessable_entity
     end
   end
@@ -60,6 +64,13 @@ class CoursesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def course_params
-      params.require(:course).permit(:start_at, :end_at, :archived, :subject_id, :school_class_id, :moment_id, :teacher_id)
+      params.require(:course).permit(:start_at, :end_at, :archived, :subject_id, :school_class_id, :moment_id, :teacher_id, :week_day)
+    end
+    
+    def load_collections
+      @teachers = Teacher.all.order(:lastname, :firstname)
+      @subjects = Subject.all.order(:name)
+      @school_classes = SchoolClass.all.order(:name)
+      @moments = Moment.all.order(start_on: :desc)
     end
 end
