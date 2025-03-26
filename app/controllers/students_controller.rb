@@ -1,6 +1,6 @@
 class StudentsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_student, only: [:show, :edit, :update, :destroy, :grade_report]
+  before_action :set_student, only: [:show, :edit, :update, :destroy, :grade_report, :promotion_check]
 
   def index
     @students = Student.includes(:user, :school_classes => [:moment, :master])
@@ -22,11 +22,42 @@ class StudentsController < ApplicationController
                               :grades => [:examination => [:course => :subject]]).find(params[:id])
   end
 
+  def promotion_check
+    @student = Student.includes(:school_classes, :grades => [:examination => [:course => [:subject => :sector]]]).find(params[:id])
+    
+    if params[:moment_id].present?
+      @moment = Moment.find(params[:moment_id])
+    else
+      @moment = @student.current_class&.moment
+    end
+    
+    if @moment
+      @promotion_results = @student.promotion_results(@moment)
+    else
+      @promotion_results = { promoted: false, reason: "No moment selected" }
+    end
+    
+    @moments = Moment.order(start_on: :desc)
+  end
+
   def grade_report
     @student = Student.includes(:school_classes, :school_classes => [:moment, :master], 
-                               :grades => [:examination => [:course => :subject]]).find(params[:id])
+                               :grades => [:examination => [:course => [:subject => :sector]]]).find(params[:id])
+    
+    # Récupérer le moment pour le bulletin (actuel par défaut)
+    if params[:moment_id].present?
+      @moment = Moment.find(params[:moment_id])
+    else
+      @moment = @student.current_class&.moment
+    end
+    
+    # Calculer les résultats de promotion si le moment est disponible
+    if @moment
+      @promotion_results = @student.promotion_results(@moment)
+    end
     
     respond_to do |format|
+      format.html
       format.pdf do
         require 'prawn'
         require 'prawn/table'
@@ -36,7 +67,7 @@ class StudentsController < ApplicationController
         # En-tête du document
         pdf.font_size(18) { pdf.text "Bulletin de notes", align: :center, style: :bold }
         pdf.move_down 10
-        pdf.font_size(12) { pdf.text "Année scolaire: #{@student.current_class&.moment&.start_on&.year || Date.current.year}", align: :center }
+        pdf.font_size(12) { pdf.text "Période: #{@moment&.uid || 'Non définie'}", align: :center }
         pdf.move_down 20
         
         # Informations sur l'étudiant
@@ -55,37 +86,72 @@ class StudentsController < ApplicationController
           pdf.font_size(14) { pdf.text "Notes", style: :bold }
           pdf.move_down 10
           
-          grades_data = [["Matière", "Note", "Date"]]
+          grades_data = [["Matière", "Secteur", "Note", "Date"]]
           
-          @student.grades.includes(:examination => [:course => :subject]).order(execute_on: :desc).each do |grade|
+          # Filtrer les notes pour le moment sélectionné
+          relevant_grades = if @moment
+            @student.grades.joins(examination: { course: :moment }).where(courses: { moment_id: @moment.id })
+          else
+            @student.grades
+          end
+          
+          relevant_grades.includes(:examination => [:course => [:subject => :sector]]).order(execute_on: :desc).each do |grade|
             grades_data << [
               grade.examination.course.subject.name,
+              grade.examination.course.subject.sector&.name || "N/A",
               grade.value.to_s,
               grade.execute_on.strftime("%d/%m/%Y")
             ]
           end
           
-          pdf.table(grades_data, header: true, width: pdf.bounds.width) do |table|
-            table.row(0).font_style = :bold
-            table.row(0).background_color = "DDDDDD"
-            table.cells.padding = [5, 10, 5, 10]
-            table.column_widths = [pdf.bounds.width * 0.5, pdf.bounds.width * 0.2, pdf.bounds.width * 0.3]
+          if grades_data.size > 1
+            pdf.table(grades_data, header: true, width: pdf.bounds.width) do |table|
+              table.row(0).font_style = :bold
+              table.row(0).background_color = "DDDDDD"
+              table.cells.padding = [5, 10, 5, 10]
+              table.column_widths = [pdf.bounds.width * 0.35, pdf.bounds.width * 0.25, pdf.bounds.width * 0.15, pdf.bounds.width * 0.25]
+            end
+          else
+            pdf.text "Aucune note enregistrée pour cette période.", style: :italic
           end
           
-          # Calcul de la moyenne
-          average = @student.grades.average(:value)&.round(2)
-          pdf.move_down 10
-          if average.present? && average >= 12 
-            pdf.text "Moyenne générale: #{average}", style: :bold, color: "008000" # Vert
+          # Information de promotion
+          if @promotion_results.present?
+            pdf.move_down 20
+            pdf.font_size(14) { pdf.text "Résultats de promotion", style: :bold }
             pdf.move_down 10
-            pdf.text "Vous êtes promu au semestre suivant", style: :bold
-          elsif average.present? && average < 12
-            pdf.text "Moyenne générale: #{average}", style: :bold, color: "FF0000" # Rouge
-            pdf.move_down 10
-            pdf.text "Vous n'êtes pas promu au semestre suivant", style: :bold
-          else
-            pdf.text "Aucune note enregistrée pour cet élève.", style: :italic
+            
+            if @promotion_results[:promoted]
+              pdf.text "DÉCISION : PROMU", style: :bold, color: "008000" # Vert
+            else
+              pdf.text "DÉCISION : NON PROMU", style: :bold, color: "FF0000" # Rouge
+              if @promotion_results[:reason].present?
+                pdf.text "Raison : #{@promotion_results[:reason]}", color: "FF0000"
+              end
+            end
+            
+            if @promotion_results[:sector_results].present?
+              pdf.move_down 10
+              secteur_data = [["Secteur", "Moyenne", "Exigence", "Résultat"]]
+              
+              @promotion_results[:sector_results].each do |sector_name, result|
+                secteur_data << [
+                  sector_name,
+                  result[:grade] ? result[:grade].round(2).to_s : "N/A",
+                  result[:function].capitalize,
+                  result[:meets_requirement] ? "Réussi" : "Échec"
+                ]
+              end
+              
+              pdf.table(secteur_data, header: true, width: pdf.bounds.width) do |table|
+                table.row(0).font_style = :bold
+                table.row(0).background_color = "DDDDDD"
+                table.cells.padding = [5, 10, 5, 10]
+              end
+            end
           end
+        else
+          pdf.text "Aucune note enregistrée pour cet élève.", style: :italic
         end
         
         # Pied de page
