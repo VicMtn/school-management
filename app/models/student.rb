@@ -4,15 +4,6 @@ class Student < Person
   has_many :grades
 
   def current_class
-    # Méthode originale avec contrainte de date (commentée pour tests)
-    # current_date = Date.current
-    # school_classes
-    #   .joins(:moment)
-    #   .where('moments.start_on <= ? AND moments.end_on >= ?', current_date, current_date)
-    #   .order('moments.start_on DESC')
-    #   .first
-    
-    # Version simplifiée qui prend simplement la classe la plus récente
     school_classes
       .joins(:moment)
       .order('moments.start_on DESC')
