@@ -1,26 +1,80 @@
 Rails.application.routes.draw do
-  resources :grades
-  resources :examinations
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
+  
+  devise_scope :user do
+    get 'users/edit', to: 'users/registrations#edit', as: 'edit_user_registration'
+    put 'users', to: 'users/registrations#update', as: 'user_registration'
+    delete 'users', to: 'users/registrations#destroy'
+  end
+
+  concern :admin_accessible do
+    member do
+      post :create_user
+    end
+  end
+
+  resources :people, concerns: :admin_accessible
+  resources :students do
+    member do
+      patch :archive
+      get :grade_report
+      get :promotion_check
+    end
+  end
+  resources :teachers do
+    member do
+      get :schedule
+    end
+  end
+  resources :deans do
+    member do
+      get :schedule
+    end
+  end
   resources :courses
+  resources :subjects do
+    member do
+      patch :restore
+    end
+  end
+  resources :promotion_asserts do
+    member do
+      patch :restore
+    end
+  end
+
+  namespace :admin do
+    root to: 'dashboard#index', as: :root
+  end
+
+  # Defines the root path route ("/")
+  root "dashboard#index"
+
+  # Academic resources
+  resources :grades
+  resources :examinations do
+    resources :grades, only: [:edit, :update, :create]
+  end
   resources :school_classes
-  resources :subjects
-  resources :promotion_asserts
   resources :moments
   resources :sectors
-  resources :people
   resources :statuses
   resources :rooms
   resources :addresses
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
+  # PWA routes (commented out)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  patch "/courses/:id/restore", to: "courses#restore", as: "restore_course"
+
+  # Custom error pages
+  match "/404", to: "errors#not_found", via: :all
+  match "/422", to: "errors#unprocessable_entity", via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
 end

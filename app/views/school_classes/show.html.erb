@@ -1,17 +1,200 @@
-<% content_for :title, "Showing school class" %>
+<% content_for :title, "Class Details" %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8 border-b border-gray-200 pb-5">
+    <div class="flex justify-between items-center">
+      <div>
+        <% if user_signed_in? && current_user.person&.type == 'Student' %>
+          <h1 class="text-2xl font-bold text-gray-800">My Class</h1>
+          <p class="mt-1 text-sm text-gray-500">Information about your current class</p>
+        <% else %>
+          <h1 class="text-2xl font-bold text-gray-800">Class Details</h1>
+          <p class="mt-1 text-sm text-gray-500">View detailed information about the class and its students.</p>
+        <% end %>
+      </div>
+      <div class="flex space-x-3">
+        <% if user_signed_in? && current_user.person&.type == 'Student' %>
+          <%= link_to courses_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            View Schedule
+          <% end %>
+        <% else %>
+          <% unless current_user.person&.type == 'Teacher' %>
+            <%= link_to edit_school_class_path(@school_class), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Class
+            <% end %>
+          <% end %>
+          <%= link_to school_classes_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Classes
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-  <h1 class="font-bold text-4xl">Showing school class</h1>
+  <div class="bg-white overflow-hidden shadow-sm rounded-xl">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
+          <span class="text-indigo-700 font-bold text-lg"><%= @school_class.name.first %></span>
+        </div>
+        <div class="ml-5">
+          <div class="flex items-center">
+            <h3 class="text-xl font-medium text-gray-900"><%= @school_class.name %></h3>
+            <span class="ml-3 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+              <%= @school_class.moment.start_on.year %>
+            </span>
+          </div>
+          <p class="text-sm text-gray-500">
+            Academic Year: <%= @school_class.moment.start_on.year %>, 
+            Semester: <%= @school_class.moment.uid %>
+          </p>
+        </div>
+      </div>
+    </div>
 
-  <%= render @school_class %>
+    <% if user_signed_in? && current_user.person&.type == 'Student' %>
+      <!-- Vue adaptée pour les étudiants -->
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h4 class="text-lg font-medium text-gray-900 mb-2">Class Teacher</h4>
+        <div class="flex items-center">
+          <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-blue-700 font-medium"><%= @school_class.master.full_name.first %></span>
+          </div>
+          <div class="ml-4">
+            <div class="text-sm font-medium text-gray-900"><%= @school_class.master.full_name %></div>
+            <div class="text-xs text-gray-500"><%= @school_class.master.email %></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="px-6 py-4">
+        <h4 class="text-lg font-medium text-gray-900 mb-4">Classmates (<%= @classmates.count %>)</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @classmates.each do |student| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-blue-700 font-medium"><%= student.full_name.first %></span>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900"><%= student.full_name %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900"><%= student.email %></div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <!-- Vue normale pour les autres utilisateurs -->
+      <div class="px-6 py-6">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Academic Year</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @school_class.moment.start_on.year %></dd>
+          </div>
 
-  <%= link_to "Edit this school class", edit_school_class_path(@school_class), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to school classes", school_classes_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <div class="sm:inline-block mt-2 sm:mt-0 sm:ml-2">
-    <%= button_to "Destroy this school class", @school_class, method: :delete, class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Semester</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @school_class.moment.uid %></dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Start Date</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @school_class.moment.start_on.strftime("%B %d, %Y") %></dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-gray-500">End Date</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @school_class.moment.end_on.strftime("%B %d, %Y") %></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="px-6 py-5 border-t border-gray-100">
+        <h4 class="text-lg font-medium text-gray-900 mb-4">Students</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @school_class.students.each do |student| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-blue-700 font-medium"><%= student.full_name.first %></span>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900"><%= student.full_name %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900"><%= student.email %></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900"><%= student.phone_number %></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <div class="flex justify-center space-x-2">
+                      <%= link_to student_path(student), class: "text-blue-600 hover:text-blue-900", title: "View student details", data: { turbo: false } do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      <% end %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+
+              <% if @school_class.students.empty? %>
+                <tr>
+                  <td colspan="4" class="px-6 py-10 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <p class="text-lg font-medium">No students found</p>
+                      <p class="mt-1">This class has no students enrolled yet</p>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

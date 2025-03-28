@@ -1,17 +1,142 @@
-<% content_for :title, "Showing examination" %>
+<% content_for :title, "Examination Details" %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8 border-b border-gray-200 pb-5">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Examination Details</h1>
+        <p class="mt-1 text-sm text-gray-500">View and manage examination information and grades.</p>
+      </div>
+      <div class="flex space-x-3">
+        <% unless current_user.person&.type == 'Teacher' %>
+          <%= link_to edit_examination_path(@examination), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit Examination
+          <% end %>
+        <% end %>
+        <%= link_to examinations_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to List
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-  <h1 class="font-bold text-4xl">Showing examination</h1>
+  <div class="bg-white overflow-hidden shadow-sm rounded-xl">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-indigo-50 rounded-lg p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <div class="flex items-center">
+            <h3 class="text-lg font-medium text-gray-900"><%= @examination.title %></h3>
+            </span>
+          </div>
+          <p class="text-sm text-gray-500">Created for <%= @examination.course.subject.name %></p>
+        </div>
+      </div>
+    </div>
 
-  <%= render @examination %>
+    <div class="px-6 py-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Subject</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @examination.course.subject.name %></dd>
+        </div>
 
-  <%= link_to "Edit this examination", edit_examination_path(@examination), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to examinations", examinations_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <div class="sm:inline-block mt-2 sm:mt-0 sm:ml-2">
-    <%= button_to "Destroy this examination", @examination, method: :delete, class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Class</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @examination.course.school_class.name %></dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Teacher</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @examination.course.teacher.full_name %></dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Date</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @examination.effective_date.strftime("%B %d, %Y") %></dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Academic Year</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @examination.course.moment.start_on.year %></dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Semester</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @examination.course.moment.uid %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="px-6 py-5 border-t border-gray-100">
+      <h4 class="text-lg font-medium text-gray-900 mb-4">Student Grades</h4>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @examination.course.school_class.students.each do |student| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span class="text-blue-700 font-medium"><%= student.full_name.first %></span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900"><%= student.full_name %></div>
+                      <div class="text-xs text-gray-500"><%= student.email %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% grade = @examination.grades.find_by(student: student) %>
+                  <% if grade&.value %>
+                    <% if grade.value >= 12 %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        <%= grade.value %>
+                      </span>
+                    <% else %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        <%= grade.value %>
+                      </span>
+                    <% end %>
+                  <% else %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      Not graded
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 text-center text-sm font-medium">
+                  <% if current_user.person&.type == 'Teacher' || current_user.person&.type == 'Dean' %>
+                    <div class="flex justify-center">
+                      <%= link_to edit_examination_grade_path(@examination, student_id: student.id), class: "text-indigo-600 hover:text-indigo-900", title: "Add/Edit Grade" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

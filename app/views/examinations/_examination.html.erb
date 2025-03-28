@@ -1,14 +1,30 @@
-<div id="<%= dom_id examination %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Title:</strong>
-    <%= examination.title %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Effective date:</strong>
-    <%= examination.effective_date %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Course:</strong>
-    <%= examination.course_id %>
+<div id="<%= dom_id examination %>" class="w-full sm:w-auto my-5">
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900"><%= examination.title %></h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        <%= examination.effective_date.strftime("%B %d, %Y") %>
+      </p>
+    </div>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Subject</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= examination.course.subject.name %></dd>
+        </div>
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Class</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= examination.course.school_class.name %></dd>
+        </div>
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Academic Year</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= examination.course.moment.start_on.year %></dd>
+        </div>
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Semester</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= examination.course.moment.uid %></dd>
+        </div>
+      </dl>
+    </div>
   </div>
 </div>

@@ -1,11 +1,11 @@
 <div id="<%= dom_id course %>" class="w-full sm:w-auto my-5 space-y-5">
   <div>
     <strong class="block font-medium mb-1">Start at:</strong>
-    <%= course.start_at %>
+    <%= course.start_at.strftime("%H:%M") %>
   </div>
   <div>
     <strong class="block font-medium mb-1">End at:</strong>
-    <%= course.end_at %>
+    <%= course.end_at.strftime("%H:%M") %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Archived:</strong>
@@ -13,22 +13,33 @@
   </div>
   <div>
     <strong class="block font-medium mb-1">Subject:</strong>
-    <%= course.subject_id %>
+    <%= course.subject&.name %>
   </div>
   <div>
     <strong class="block font-medium mb-1">School class:</strong>
-    <%= course.school_class_id %>
+    <%= course.school_class&.name %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Moment:</strong>
-    <%= course.moment_id %>
+    <%= course.moment&.uid %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Teacher:</strong>
-    <%= course.teacher_id %>
+    <%= course.teacher&.full_name %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Week day:</strong>
-    <%= course.week_day %>
+    <%= 
+      case course.week_day
+      when 0 then "Sunday"
+      when 1 then "Monday"
+      when 2 then "Tuesday"
+      when 3 then "Wednesday" 
+      when 4 then "Thursday"
+      when 5 then "Friday"
+      when 6 then "Saturday"
+      else "Unknown"
+      end
+    %>
   </div>
 </div>

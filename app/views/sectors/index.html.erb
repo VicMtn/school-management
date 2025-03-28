@@ -1,31 +1,110 @@
 <% content_for :title, "Sectors" %>
 
-<div class="w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <%= render "shared/admin_tabs" %>
 
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Sectors</h1>
-    <%= link_to "New sector", new_sector_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+  <div class="mb-8 border-b border-gray-200 pb-5">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Sectors</h1>
+        <p class="mt-1 text-sm text-gray-500">Manage all academic sectors in the school</p>
+      </div>
+      <div>
+        <%= link_to new_sector_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          New Sector
+        <% end %>
+      </div>
+    </div>
   </div>
-
-  <div id="sectors" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @sectors.any? %>
-      <% @sectors.each do |sector| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render sector %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", sector, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_sector_path(sector), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <div class="sm:inline-block">
-              <%= button_to "Destroy", sector, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-            </div>
-          </div>
+  
+  <!-- Admin View -->
+  <div class="bg-white overflow-hidden shadow-sm rounded-xl">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-indigo-50 rounded-lg p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
         </div>
-      <% end %>
-    <% else %>
-      <p class="text-center my-10">No sectors found.</p>
-    <% end %>
+        <div class="ml-4">
+          <h3 class="text-lg font-medium text-gray-900">Sector Directory</h3>
+          <p class="text-sm text-gray-500"><%= @sectors.count %> sectors found</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sector</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subjects</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @sectors.each do |sector| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <span class="text-green-700 font-medium"><%= sector.name.first %></span>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900"><%= sector.name %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% subjects_count = Subject.where(sector_id: sector.id).count rescue 0 %>
+                <div class="text-sm text-gray-900"><%= subjects_count %> subjects</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% students_count = Student.joins(:school_class).where(school_classes: { sector_id: sector.id }).distinct.count rescue 0 %>
+                <div class="text-sm text-gray-900"><%= students_count %> students</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                <div class="flex justify-center space-x-2">
+                  <%= link_to sector_path(sector), class: "text-blue-600 hover:text-blue-900", title: "View details", data: { turbo: false } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  <% end %>
+                  <%= link_to edit_sector_path(sector), class: "text-indigo-600 hover:text-indigo-900", title: "Edit sector", data: { turbo: false } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  <% end %>
+                  <%= button_to sector_path(sector), method: :delete, class: "text-red-600 hover:text-red-900", title: "Delete sector", data: { turbo_confirm: "Are you sure you want to delete this sector? This will affect all related subjects and school classes." } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          
+          <% if @sectors.empty? %>
+            <tr>
+              <td colspan="4" class="px-6 py-10 text-center">
+                <div class="flex flex-col items-center justify-center text-gray-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
+                  <p class="text-lg font-medium">No sectors found</p>
+                  <p class="mt-1">Add a new sector to get started</p>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

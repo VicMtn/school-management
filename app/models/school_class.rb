@@ -1,4 +1,6 @@
 class SchoolClass < ApplicationRecord
+  include SoftDeletable
+  
   belongs_to :moment
   belongs_to :room
   belongs_to :master, class_name: 'Person'

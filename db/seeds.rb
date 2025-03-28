@@ -1,8 +1,6 @@
-
-
 # Cleaning database
 puts "Cleaning database..."
-[Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass].each do |model|
+[Grade, Examination, Course, StudentsClass, Subject, Person, Status, Address, Room, Sector, Moment, SchoolClass, User, PromotionAssert].each do |model|
   model.delete_all
 end
 
@@ -13,49 +11,36 @@ inactive_status = Status.create!(title: "Inactive", slug: "inactive")
 
 # Create addresses
 puts "Creating addresses..."
-addresses = [
-  Address.create!(zip: 75001, town: "Paris", street: "Rue de Rivoli", number: "1"),
-  Address.create!(zip: 75002, town: "Paris", street: "Rue Montorgueil", number: "2"),
-  Address.create!(zip: 75003, town: "Paris", street: "Rue de Bretagne", number: "3"),
-  Address.create!(zip: 75004, town: "Paris", street: "Rue des Archives", number: "4"),
-  Address.create!(zip: 75005, town: "Paris", street: "Rue Mouffetard", number: "5"),
-  Address.create!(zip: 75006, town: "Paris", street: "Rue de Seine", number: "6"),
-  Address.create!(zip: 75007, town: "Paris", street: "Rue de Grenelle", number: "7"),
-  Address.create!(zip: 75008, town: "Paris", street: "Avenue des Champs-Élysées", number: "8"),
-  Address.create!(zip: 75009, town: "Paris", street: "Rue de la Paix", number: "9"),
-  Address.create!(zip: 75010, town: "Paris", street: "Rue du Faubourg Saint-Martin", number: "10"),
-  Address.create!(zip: 75011, town: "Paris", street: "Rue de la Roquette", number: "11"),
-  Address.create!(zip: 75012, town: "Paris", street: "Rue de Charenton", number: "12"),
-  Address.create!(zip: 75013, town: "Paris", street: "Rue de la Butte aux Cailles", number: "13"),
-  Address.create!(zip: 75014, town: "Paris", street: "Rue du Montparnasse", number: "14"),
-  Address.create!(zip: 75015, town: "Paris", street: "Rue de Vaugirard", number: "15"),
-  Address.create!(zip: 75016, town: "Paris", street: "Avenue Victor Hugo", number: "16"),
-  Address.create!(zip: 75017, town: "Paris", street: "Rue des Batignolles", number: "17"),
-  Address.create!(zip: 75018, town: "Paris", street: "Rue de la Goutte d'Or", number: "18"),
-  Address.create!(zip: 75019, town: "Paris", street: "Rue de Crimée", number: "19"),
-  Address.create!(zip: 75020, town: "Paris", street: "Rue de Ménilmontant", number: "20")
-]
+addresses = []
+40.times do
+  addresses << Address.create!(
+    zip: Faker::Address.zip_code.to_i,
+    town: Faker::Address.city,
+    street: Faker::Address.street_name,
+    number: Faker::Address.building_number
+  )
+end
 
 # Create rooms
 puts "Creating rooms..."
-rooms = [
-  Room.create!(name: "101"),
-  Room.create!(name: "102"),
-  Room.create!(name: "201"),
-  Room.create!(name: "202"),
-  Room.create!(name: "301"),
-  Room.create!(name: "302"),
-  Room.create!(name: "401"),
-  Room.create!(name: "402")
-]
+rooms = []
+8.times do |i|
+  floor = (i / 4) + 1
+  room_number = (i % 4) + 1
+  rooms << Room.create!(name: "#{floor}0#{room_number}")
+end
 
 # Create sectors
 puts "Creating sectors..."
 sectors = [
   Sector.create!(name: "Sciences"),
-  Sector.create!(name: "Lettres"),
+  Sector.create!(name: "Humanities"),
   Sector.create!(name: "Arts"),
-  Sector.create!(name: "Technologies")
+  Sector.create!(name: "Technology"),
+  Sector.create!(name: "Languages"),
+  Sector.create!(name: "Physical Education"),
+  Sector.create!(name: "Social Sciences"),
+  Sector.create!(name: "Business")
 ]
 
 # Create moments (periods)
@@ -63,398 +48,358 @@ puts "Creating moments..."
 current_moment = Moment.create!(
   uid: "2024-S1",
   start_on: Date.new(2024, 9, 1),
-  end_on: Date.new(2025, 6, 30),
+  end_on: Date.new(2025, 1, 31),
   moment_type: 0
 )
 
+previous_moment = Moment.create!(
+  uid: "2024-S0",
+  start_on: Date.new(2024, 2, 1),
+  end_on: Date.new(2024, 6, 30),
+  moment_type: 0
+)
+
+older_moment = Moment.create!(
+  uid: "2023-S1",
+  start_on: Date.new(2023, 9, 1),
+  end_on: Date.new(2024, 1, 31),
+  moment_type: 0
+)
+
+# Array of all moments for easy access
+moments = [current_moment, previous_moment, older_moment]
+
 # Create deans
 puts "Creating deans..."
-deans = [
-  Dean.create!(
-    username: "dean1",
-    firstname: "Jean",
-    lastname: "Dupont",
-    email: "jean.dupont@school.com",
-    phone_number: "0612345678",
-    iban: "FR7630006000011234567890189",
-    status: active_status,
-    address: addresses[0]
-  ),
-  Dean.create!(
-    username: "dean2",
-    firstname: "Marie",
-    lastname: "Martin",
-    email: "marie.martin@school.com",
-    phone_number: "0623456789",
-    iban: "FR7630006000011234567890188",
-    status: active_status,
-    address: addresses[1]
+deans = []
+
+# Créer un premier doyen avec des identifiants connus
+fixed_dean_email = "dean@school.com"
+deans << Dean.create!(
+  username: "dean1",
+  firstname: "John",
+  lastname: "Director",
+  email: fixed_dean_email,
+  phone_number: "0791234567",
+  iban: "CH9300762011623852957",
+  status: active_status,
+  address: addresses[0],
+  user: User.create!(
+    email: fixed_dean_email,
+    password: "password123",
+    password_confirmation: "password123"
   )
-]
+)
+
+# Créer le deuxième doyen
+email = Faker::Internet.unique.email(domain: 'school.com')
+deans << Dean.create!(
+  username: "dean2",
+  firstname: Faker::Name.first_name,
+  lastname: Faker::Name.last_name,
+  email: email,
+  phone_number: Faker::PhoneNumber.cell_phone,
+  iban: Faker::Bank.iban(country_code: 'CH'),
+  status: active_status,
+  address: addresses[1],
+  user: User.create!(
+    email: email,
+    password: "password123",
+    password_confirmation: "password123"
+  )
+)
 
 # Create teachers
 puts "Creating teachers..."
-teachers = [
-  Teacher.create!(
-    username: "teacher1",
-    firstname: "Pierre",
-    lastname: "Durand",
-    email: "pierre.durand@school.com",
-    phone_number: "0634567890",
-    iban: "FR7630006000011234567890187",
-    status: active_status,
-    address: addresses[2]
-  ),
-  Teacher.create!(
-    username: "teacher2",
-    firstname: "Sophie",
-    lastname: "Petit",
-    email: "sophie.petit@school.com",
-    phone_number: "0645678901",
-    iban: "FR7630006000011234567890186",
-    status: active_status,
-    address: addresses[3]
-  ),
-  Teacher.create!(
-    username: "teacher3",
-    firstname: "Lucas",
-    lastname: "Bernard",
-    email: "lucas.bernard@school.com",
-    phone_number: "0656789012",
-    iban: "FR7630006000011234567890185",
-    status: active_status,
-    address: addresses[4]
+teachers = []
+
+# Créer un enseignant avec des identifiants connus
+fixed_teacher_email = "teacher@school.com"
+teachers << Teacher.create!(
+  username: "teacher1",
+  firstname: "Robert",
+  lastname: "Smith",
+  email: fixed_teacher_email,
+  phone_number: "0792345678",
+  iban: "CH9300762011623852958",
+  status: active_status,
+  address: addresses[2],
+  user: User.create!(
+    email: fixed_teacher_email,
+    password: "password123",
+    password_confirmation: "password123"
   )
-]
+)
+
+# Créer les autres enseignants
+9.times do |i|
+  email = Faker::Internet.unique.email(domain: 'school.com')
+  teachers << Teacher.create!(
+    username: "teacher#{i+2}",
+    firstname: Faker::Name.first_name,
+    lastname: Faker::Name.last_name,
+    email: email,
+    phone_number: Faker::PhoneNumber.cell_phone,
+    iban: Faker::Bank.iban(country_code: 'CH'),
+    status: active_status,
+    address: addresses[i+4],
+    user: User.create!(
+      email: email,
+      password: "password123",
+      password_confirmation: "password123"
+    )
+  )
+end
 
 # Create subjects
 puts "Creating subjects..."
-subjects = [
-  Subject.create!(
-    slug: "math",
-    name: "Mathématiques",
-    teacher: teachers[0]
-  ),
-  Subject.create!(
-    slug: "phys",
-    name: "Physique",
-    teacher: teachers[0]
-  ),
-  Subject.create!(
-    slug: "hist",
-    name: "Histoire",
-    teacher: teachers[1]
-  ),
-  Subject.create!(
-    slug: "geo",
-    name: "Géographie",
-    teacher: teachers[1]
-  ),
-  Subject.create!(
-    slug: "info",
-    name: "Informatique",
-    teacher: teachers[2]
-  ),
-  Subject.create!(
-    slug: "angl",
-    name: "Anglais",
-    teacher: teachers[2]
-  )
+subject_data = [
+  { slug: "math", name: "Mathematics", sector: "Sciences" },
+  { slug: "phys", name: "Physics", sector: "Sciences" },
+  { slug: "hist", name: "History", sector: "Humanities" },
+  { slug: "geo", name: "Geography", sector: "Humanities" },
+  { slug: "info", name: "Computer Science", sector: "Technology" },
+  { slug: "engl", name: "English", sector: "Languages" },
+  { slug: "biol", name: "Biology", sector: "Sciences" },
+  { slug: "chem", name: "Chemistry", sector: "Sciences" },
+  { slug: "fren", name: "French", sector: "Languages" },
+  { slug: "germ", name: "German", sector: "Languages" },
+  { slug: "arts", name: "Arts", sector: "Arts" },
+  { slug: "musi", name: "Music", sector: "Arts" },
+  { slug: "phyed", name: "Physical Education", sector: "Physical Education" },
+  { slug: "econ", name: "Economics", sector: "Business" },
+  { slug: "psyc", name: "Psychology", sector: "Social Sciences" },
+  { slug: "soci", name: "Sociology", sector: "Social Sciences" }
 ]
+
+subjects = []
+subject_data.each_with_index do |data, i|
+  # Trouver le secteur correspondant
+  sector = sectors.find { |s| s.name == data[:sector] }
+  
+  subjects << Subject.create!(
+    slug: data[:slug],
+    name: data[:name],
+    teacher: teachers[i % teachers.size],
+    sector: sector
+  )
+end
 
 # Create school classes
 puts "Creating school classes..."
-school_classes = [
-  SchoolClass.create!(
-    uid: "1A",
-    name: "Première A",
-    moment: current_moment,
-    room: rooms[0],
-    sector: sectors[0],
-    master: deans[0]
-  ),
-  SchoolClass.create!(
-    uid: "1B",
-    name: "Première B",
-    moment: current_moment,
-    room: rooms[1],
-    sector: sectors[1],
-    master: teachers[0]
-  )
+school_classes = []
+class_names = [
+  { uid: "1A", name: "First Year A" },
+  { uid: "1B", name: "First Year B" },
+  { uid: "2A", name: "Second Year A" },
+  { uid: "2B", name: "Second Year B" }
 ]
+
+# Select which teachers will be masters (just use the first 2)
+master_teachers = teachers[0..1]
+
+class_names.each_with_index do |class_data, i|
+  if i < 2
+    # Assign first two classes to deans
+    school_classes << SchoolClass.create!(
+      uid: class_data[:uid],
+      name: class_data[:name],
+      moment: current_moment,
+      room: rooms[i],
+      sector: sectors[i % sectors.size],
+      master: deans[i]
+    )
+  else
+    # Assign remaining classes to selected teachers
+    teacher_index = i - 2  # adjust index to start at 0 for teachers
+    school_classes << SchoolClass.create!(
+      uid: class_data[:uid],
+      name: class_data[:name],
+      moment: current_moment,
+      room: rooms[i],
+      sector: sectors[i % sectors.size],
+      master: master_teachers[teacher_index]
+    )
+  end
+end
+
+# Create promotion assertions
+puts "Creating promotion assertions..."
+promotion_functions = ["average", "minimum", "maximum"]
+
+# Créer des assertions pour chaque moment (période)
+moments.each do |moment|
+  # Créer une assertion pour chaque secteur principal
+  main_sectors = ["Sciences", "Humanities", "Languages", "Technology"]
+  
+  main_sectors.each_with_index do |sector_name, index|
+    sector = sectors.find { |s| s.name == sector_name }
+    
+    # Choisir une fonction différente pour chaque secteur (pour la variété)
+    function = promotion_functions[index % promotion_functions.size]
+    
+    PromotionAssert.create!(
+      description: "#{function.capitalize} grade for #{sector_name}",
+      function: function,
+      moment: moment,
+      sector: sector
+    )
+  end
+end
 
 # Create students
 puts "Creating students..."
-students = [
-  Student.create!(
-    username: "student1",
-    firstname: "Lucas",
-    lastname: "Moreau",
-    email: "lucas.moreau@school.com",
-    phone_number: "0656789012",
-    iban: "FR7630006000011234567890185",
-    status: active_status,
-    address: addresses[5]
-  ),
-  Student.create!(
-    username: "student2",
-    firstname: "Emma",
-    lastname: "Laurent",
-    email: "emma.laurent@school.com",
-    phone_number: "0667890123",
-    iban: "FR7630006000011234567890184",
-    status: active_status,
-    address: addresses[6]
-  ),
-  Student.create!(
-    username: "student3",
-    firstname: "Hugo",
-    lastname: "Simon",
-    email: "hugo.simon@school.com",
-    phone_number: "0678901234",
-    iban: "FR7630006000011234567890183",
-    status: active_status,
-    address: addresses[7]
-  ),
-  Student.create!(
-    username: "student4",
-    firstname: "Léa",
-    lastname: "Michel",
-    email: "lea.michel@school.com",
-    phone_number: "0689012345",
-    iban: "FR7630006000011234567890182",
-    status: active_status,
-    address: addresses[8]
-  ),
-  Student.create!(
-    username: "student5",
-    firstname: "Arthur",
-    lastname: "Dubois",
-    email: "arthur.dubois@school.com",
-    phone_number: "0690123456",
-    iban: "FR7630006000011234567890181",
-    status: active_status,
-    address: addresses[9]
-  ),
-  Student.create!(
-    username: "student6",
-    firstname: "Chloé",
-    lastname: "Robert",
-    email: "chloe.robert@school.com",
-    phone_number: "0611234567",
-    iban: "FR7630006000011234567890180",
-    status: active_status,
-    address: addresses[10]
-  ),
-  Student.create!(
-    username: "student7",
-    firstname: "Louis",
-    lastname: "Richard",
-    email: "louis.richard@school.com",
-    phone_number: "0622345678",
-    iban: "FR7630006000011234567890179",
-    status: active_status,
-    address: addresses[11]
-  ),
-  Student.create!(
-    username: "student8",
-    firstname: "Jade",
-    lastname: "Petit",
-    email: "jade.petit@school.com",
-    phone_number: "0633456789",
-    iban: "FR7630006000011234567890178",
-    status: active_status,
-    address: addresses[12]
-  ),
-  Student.create!(
-    username: "student9",
-    firstname: "Gabriel",
-    lastname: "Durand",
-    email: "gabriel.durand@school.com",
-    phone_number: "0644567890",
-    iban: "FR7630006000011234567890177",
-    status: active_status,
-    address: addresses[13]
-  ),
-  Student.create!(
-    username: "student10",
-    firstname: "Rose",
-    lastname: "Leroy",
-    email: "rose.leroy@school.com",
-    phone_number: "0655678901",
-    iban: "FR7630006000011234567890176",
-    status: active_status,
-    address: addresses[14]
-  ),
-  Student.create!(
-    username: "student11",
-    firstname: "Raphaël",
-    lastname: "Morel",
-    email: "raphael.morel@school.com",
-    phone_number: "0666789012",
-    iban: "FR7630006000011234567890175",
-    status: active_status,
-    address: addresses[15]
-  ),
-  Student.create!(
-    username: "student12",
-    firstname: "Alice",
-    lastname: "Fournier",
-    email: "alice.fournier@school.com",
-    phone_number: "0677890123",
-    iban: "FR7630006000011234567890174",
-    status: active_status,
-    address: addresses[16]
-  ),
-  Student.create!(
-    username: "student13",
-    firstname: "Adam",
-    lastname: "Girard",
-    email: "adam.girard@school.com",
-    phone_number: "0688901234",
-    iban: "FR7630006000011234567890173",
-    status: active_status,
-    address: addresses[17]
-  ),
-  Student.create!(
-    username: "student14",
-    firstname: "Lina",
-    lastname: "Bonnet",
-    email: "lina.bonnet@school.com",
-    phone_number: "0699012345",
-    iban: "FR7630006000011234567890172",
-    status: active_status,
-    address: addresses[18]
-  ),
-  Student.create!(
-    username: "student15",
-    firstname: "Noah",
-    lastname: "Dupuis",
-    email: "noah.dupuis@school.com",
-    phone_number: "0610123456",
-    iban: "FR7630006000011234567890171",
-    status: active_status,
-    address: addresses[19]
-  )
-]
+students = []
 
-# Associate students with classes (8 in the first class, 7 in the second)
+# Créer un étudiant avec des identifiants connus
+fixed_student_email = "student@school.com"
+students << Student.create!(
+  username: "student1",
+  firstname: "Alice",
+  lastname: "Johnson",
+  email: fixed_student_email,
+  phone_number: "0793456789",
+  iban: "CH9300762011623852959",
+  status: active_status,
+  address: addresses[3],
+  user: User.create!(
+    email: fixed_student_email,
+    password: "password123",
+    password_confirmation: "password123"
+  )
+)
+
+# Créer les autres étudiants
+39.times do |i|
+  email = Faker::Internet.unique.email(domain: 'school.com')
+  students << Student.create!(
+    username: "student#{i+2}",
+    firstname: Faker::Name.first_name,
+    lastname: Faker::Name.last_name,
+    email: email,
+    phone_number: Faker::PhoneNumber.cell_phone,
+    iban: Faker::Bank.iban(country_code: 'CH'),
+    status: active_status,
+    address: addresses[(i+4) % addresses.size],
+    user: User.create!(
+      email: email,
+      password: "password123",
+      password_confirmation: "password123"
+    )
+  )
+end
+
+# Associate students with classes - make sure all students have a class
 puts "Associating students with classes..."
-students[0..7].each do |student|
-  StudentsClass.create!(student: student, school_class: school_classes[0])
+# Ensure every student is assigned to a class
+# Distribute students evenly among the classes
+students.each_with_index do |student, i|
+  StudentsClass.create!(student: student, school_class: school_classes[i % school_classes.size])
 end
-students[8..14].each do |student|
-  StudentsClass.create!(student: student, school_class: school_classes[1])
-end
+
+# Load the courses seeder if needed
+# require_relative 'seeds/courses'
 
 # Create courses
 puts "Creating courses..."
-courses = [
-  Course.create!(
-    start_at: "08:00",
-    end_at: "09:30",
-    archived: false,
-    subject: subjects[0],
-    school_class: school_classes[0],
-    moment: current_moment,
-    teacher: teachers[0],
-    week_day: 1
-  ),
-  Course.create!(
-    start_at: "10:00",
-    end_at: "11:30",
-    archived: false,
-    subject: subjects[1],
-    school_class: school_classes[1],
-    moment: current_moment,
-    teacher: teachers[0],
-    week_day: 2
-  ),
-  Course.create!(
-    start_at: "13:30",
-    end_at: "15:00",
-    archived: false,
-    subject: subjects[2],
-    school_class: school_classes[0],
-    moment: current_moment,
-    teacher: teachers[1],
-    week_day: 3
-  ),
-  Course.create!(
-    start_at: "15:30",
-    end_at: "17:00",
-    archived: false,
-    subject: subjects[3],
-    school_class: school_classes[1],
-    moment: current_moment,
-    teacher: teachers[1],
-    week_day: 4
-  ),
-  Course.create!(
-    start_at: "08:00",
-    end_at: "09:30",
-    archived: false,
-    subject: subjects[4],
-    school_class: school_classes[0],
-    moment: current_moment,
-    teacher: teachers[2],
-    week_day: 5
-  ),
-  Course.create!(
-    start_at: "10:00",
-    end_at: "11:30",
-    archived: false,
-    subject: subjects[5],
-    school_class: school_classes[1],
-    moment: current_moment,
-    teacher: teachers[2],
-    week_day: 5
-  )
+courses = []
+week_days = (1..5).to_a  # Monday to Friday
+time_slots = [
+  { start: "08:15", end: "09:00" },
+  { start: "09:05", end: "09:50" },
+  { start: "10:05", end: "10:50" },
+  { start: "10:55", end: "11:40" },
+  { start: "11:45", end: "12:30" },
+  { start: "13:20", end: "14:05" },
+  { start: "14:10", end: "14:55" },
+  { start: "15:05", end: "15:50" },
+  { start: "15:55", end: "16:40" },
+  { start: "16:45", end: "17:30" },
 ]
+
+# Distribuer les matières sur différents semestres
+first_half_subjects = subjects[0...(subjects.size/2)]
+second_half_subjects = subjects[(subjects.size/2)..-1]
+
+# Créer des cours pour chaque semestre
+moments.each do |moment|
+  # Premier groupe de sujets pour les semestres impairs (S1)
+  subjects_for_moment = if moment.uid.include?("S1") || moment.uid.include?("S0")
+                         first_half_subjects
+                       else
+                         second_half_subjects
+                       end
+  
+  subjects_for_moment.each_with_index do |subject, i|
+    school_classes.each_with_index do |school_class, j|
+      time_slot = time_slots[(i + j) % time_slots.size]
+      week_day = week_days[i % week_days.size]
+      
+      # Assigner une salle au cours, en favorisant la salle de la classe ou une autre si nécessaire
+      room = [(i + j) % 2 == 0 ? school_class.room : rooms.sample].sample
+      
+      courses << Course.create!(
+        start_at: time_slot[:start],
+        end_at: time_slot[:end],
+        archived: false,
+        subject: subject,
+        school_class: school_class,
+        moment: moment,
+        teacher: subject.teacher,
+        week_day: week_day,
+        room_id: room.id
+      )
+    end
+  end
+end
 
 # Create examinations
 puts "Creating examinations..."
-examinations = [
-  Examination.create!(
-    title: "Contrôle de Mathématiques",
-    effective_date: Date.new(2024, 10, 15),
-    course: courses[0]
-  ),
-  Examination.create!(
-    title: "Contrôle de Physique",
-    effective_date: Date.new(2024, 10, 16),
-    course: courses[1]
-  ),
-  Examination.create!(
-    title: "Contrôle d'Histoire",
-    effective_date: Date.new(2024, 10, 17),
-    course: courses[2]
-  ),
-  Examination.create!(
-    title: "Contrôle de Géographie",
-    effective_date: Date.new(2024, 10, 18),
-    course: courses[3]
-  )
-]
+examinations = []
+
+# 3 examinations par cours
+courses.each_with_index do |course, i|
+  moment_date_start = course.moment.start_on
+  
+  # Créer 3 examens pour chaque cours à différentes dates dans le semestre
+  3.times do |exam_num|
+    # Répartir les examens dans le semestre (début, milieu, fin)
+    date_offset = case exam_num
+                 when 0 then 30  # Premier exam après 1 mois
+                 when 1 then 75  # Deuxième exam vers le milieu du semestre
+                 when 2 then 120 # Dernier exam vers la fin du semestre
+                 end
+    
+    examination_date = moment_date_start + date_offset.days
+    
+    examinations << Examination.create!(
+      title: "#{course.subject.name} - Exam #{exam_num + 1}",
+      effective_date: examination_date,
+      course: course
+    )
+  end
+end
 
 # Create grades
 puts "Creating grades..."
-students[0..7].each do |student|
-  Grade.create!(
-    value: rand(10..20),
-    execute_on: Date.new(2024, 10, 15),
-    examination: examinations[0],
-    student: student
-  )
-end
-
-students[8..14].each do |student|
-  Grade.create!(
-    value: rand(10..20),
-    execute_on: Date.new(2024, 10, 16),
-    examination: examinations[1],
-    student: student
-  )
+students.each do |student|
+  # Get the student's class
+  student_class = student.students_classes.first.school_class
+  
+  # Get examinations for courses in that class
+  class_examinations = examinations.select do |exam| 
+    exam.course.school_class == student_class
+  end
+  
+  # Create grades for each examination
+  class_examinations.each do |exam|
+    Grade.create!(
+      value: rand(5..20),
+      execute_on: exam.effective_date,
+      examination: exam,
+      student: student
+    )
+  end
 end
 
 # Verifications
@@ -475,15 +420,35 @@ puts "Students Classes : #{StudentsClass.count}"
 puts "Courses : #{Course.count}"
 puts "Examinations : #{Examination.count}"
 puts "Grades : #{Grade.count}"
+puts "Promotion Assertions : #{PromotionAssert.count}"
 puts "--------------------------------"
 
 puts "\nVerifications of associations :"
 puts "--------------------------------"
-puts "First class (1A) : #{school_classes[0].students_classes.count} students"
-puts "Second class (1B) : #{school_classes[1].students_classes.count} students"
-puts "Number of courses per teacher :"
+school_classes.each do |school_class|
+  puts "#{school_class.name} : #{school_class.students_classes.count} students"
+end
+
+puts "Class masters:"
+school_classes.each do |school_class|
+  master = school_class.master
+  master_type = master.is_a?(Dean) ? "Dean" : "Teacher"
+  puts "- #{school_class.name} : Master is #{master.full_name} (#{master_type})"
+end
+
+puts "Number of courses per teacher:"
 teachers.each do |teacher|
-  puts "- #{teacher.full_name} : #{teacher.courses.count} cours"
+  puts "- #{teacher.full_name} : #{teacher.courses.count} courses"
+end
+
+puts "Subject sectors:"
+subjects.each do |subject|
+  puts "- #{subject.name} : #{subject.sector&.name || 'No sector'}"
+end
+
+puts "Promotion assertions per moment:"
+moments.each do |moment|
+  puts "- #{moment.uid} : #{PromotionAssert.where(moment: moment).count} assertions"
 end
 puts "--------------------------------"
 

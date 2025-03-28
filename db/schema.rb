@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_28_021059) do
   create_table "addresses", force: :cascade do |t|
     t.integer "zip"
     t.string "town"
@@ -31,7 +31,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "week_day"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.integer "room_id", null: false
     t.index ["moment_id"], name: "index_courses_on_moment_id"
+    t.index ["room_id"], name: "index_courses_on_room_id"
     t.index ["school_class_id"], name: "index_courses_on_school_class_id"
     t.index ["subject_id"], name: "index_courses_on_subject_id"
     t.index ["teacher_id"], name: "index_courses_on_teacher_id"
@@ -43,6 +46,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "course_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["course_id"], name: "index_examinations_on_course_id"
   end
 
@@ -53,6 +57,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "student_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "execution_date"
+    t.datetime "deleted_at"
     t.index ["examination_id"], name: "index_grades_on_examination_id"
     t.index ["student_id"], name: "index_grades_on_student_id"
   end
@@ -79,8 +85,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "type"
+    t.integer "user_id", null: false
+    t.datetime "deleted_at"
     t.index ["address_id"], name: "index_people_on_address_id"
     t.index ["status_id"], name: "index_people_on_status_id"
+    t.index ["user_id"], name: "index_people_on_user_id"
   end
 
   create_table "promotion_asserts", force: :cascade do |t|
@@ -90,6 +99,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "sector_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["moment_id"], name: "index_promotion_asserts_on_moment_id"
     t.index ["sector_id"], name: "index_promotion_asserts_on_sector_id"
   end
@@ -109,6 +119,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "sector_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["master_id"], name: "index_school_classes_on_master_id"
     t.index ["moment_id"], name: "index_school_classes_on_moment_id"
     t.index ["room_id"], name: "index_school_classes_on_room_id"
@@ -133,6 +144,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "school_class_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["school_class_id"], name: "index_students_classes_on_school_class_id"
     t.index ["student_id"], name: "index_students_classes_on_student_id"
   end
@@ -143,11 +155,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
     t.integer "teacher_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.integer "sector_id"
+    t.index ["sector_id"], name: "index_subjects_on_sector_id"
     t.index ["teacher_id"], name: "index_subjects_on_teacher_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "courses", "moments"
   add_foreign_key "courses", "people", column: "teacher_id"
+  add_foreign_key "courses", "rooms"
   add_foreign_key "courses", "school_classes"
   add_foreign_key "courses", "subjects"
   add_foreign_key "examinations", "courses"
@@ -155,6 +183,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
   add_foreign_key "grades", "people", column: "student_id"
   add_foreign_key "people", "addresses"
   add_foreign_key "people", "statuses"
+  add_foreign_key "people", "users"
   add_foreign_key "promotion_asserts", "moments"
   add_foreign_key "promotion_asserts", "sectors"
   add_foreign_key "school_classes", "moments"
@@ -164,4 +193,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_142727) do
   add_foreign_key "students_classes", "people", column: "student_id"
   add_foreign_key "students_classes", "school_classes"
   add_foreign_key "subjects", "people", column: "teacher_id"
+  add_foreign_key "subjects", "sectors"
 end

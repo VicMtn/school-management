@@ -5,14 +5,21 @@
   </div>
   <div>
     <strong class="block font-medium mb-1">Function:</strong>
-    <%= promotion_assert.function %>
+    <%= 
+      case promotion_assert.function
+      when "average" then "Average"
+      when "minimum" then "Minimum"
+      when "maximum" then "Maximum"
+      else promotion_assert.function
+      end
+    %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Moment:</strong>
-    <%= promotion_assert.moment_id %>
+    <%= promotion_assert.moment&.uid %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Sector:</strong>
-    <%= promotion_assert.sector_id %>
+    <%= promotion_assert.sector&.name %>
   </div>
 </div>

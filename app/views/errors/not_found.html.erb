@@ -1,0 +1,17 @@
+<% content_for :title do %>Page Not Found | 404<% end %>
+
+<div class="flex items-center justify-center min-h-[70vh] px-4 sm:px-6 lg:px-8">
+  <div class="text-center">
+    <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">404</h1>
+    <p class="mt-6 text-xl text-gray-500">La page que vous recherchez n'existe pas ou vous n'y avez pas accès.</p>
+    <div class="mt-10">
+      <%= link_to "Retour à l'accueil", root_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    </div>
+    
+    <div class="mt-12">
+      <svg class="mx-auto h-36 w-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+  </div>
+</div> 

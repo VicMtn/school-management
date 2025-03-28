@@ -1,9 +1,101 @@
-<% content_for :title, "New examination" %>
+<% content_for :title, "New Examination" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">New examination</h1>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8 border-b border-gray-200 pb-5">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">New Examination</h1>
+        <p class="mt-1 text-sm text-gray-500">Create a new examination for your class.</p>
+      </div>
+      <div>
+        <%= link_to examinations_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Examinations
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-  <%= render "form", examination: @examination %>
+  <div class="bg-white overflow-hidden shadow-sm rounded-xl">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-indigo-50 rounded-lg p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-medium text-gray-900">Examination Details</h3>
+          <p class="text-sm text-gray-500">Fill in the details for the new examination.</p>
+        </div>
+      </div>
+    </div>
 
-  <%= link_to "Back to examinations", examinations_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+    <div class="px-6 py-6">
+      <%= form_with(model: @examination, local: true, class: "space-y-6") do |f| %>
+        <% if @examination.errors.any? %>
+          <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                  <%= pluralize(@examination.errors.count, "error") %> prohibited this examination from being saved:
+                </h3>
+                <div class="mt-2 text-sm text-red-700">
+                  <ul class="list-disc pl-5 space-y-1">
+                    <% @examination.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label for="examination_title" class="block text-sm font-medium text-gray-700">Title</label>
+            <div class="mt-1">
+              <%= f.text_field :title, class: " p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md", placeholder: "Enter examination title" %>
+            </div>
+          </div>
+
+          <div>
+            <label for="examination_course_id" class="block text-sm font-medium text-gray-700">Course</label>
+            <div class="mt-1 border border-gray-300 rounded-lg">
+              <%= f.collection_select :course_id, 
+                  current_user.person.courses, 
+                  :id, 
+                  ->(course) { "#{course.subject.name} - #{course.school_class.name}" }, 
+                  { include_blank: "Select a course" },
+                  class: "block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" %>
+            </div>
+          </div>
+
+          <div>
+            <label for="examination_effective_date" class="block text-sm font-medium text-gray-700">Date</label>
+            <div class="mt-1 border border-gray-300 rounded-lg">
+              <%= f.date_field :effective_date, class: " p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <%= f.button type: "submit", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Create Examination
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>

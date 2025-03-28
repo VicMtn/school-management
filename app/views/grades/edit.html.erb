@@ -1,10 +1,97 @@
-<% content_for :title, "Editing grade" %>
+<% content_for :title, "Edit Grade" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing grade</h1>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8 border-b border-gray-200 pb-5">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Edit Grade</h1>
+        <p class="mt-1 text-sm text-gray-500">Modify student's grade for this examination.</p>
+      </div>
+      <div>
+        <%= link_to examination_path(@examination), class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Examination
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-  <%= render "form", grade: @grade %>
+  <div class="bg-white overflow-hidden shadow-sm rounded-xl">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-indigo-50 rounded-lg p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <div class="ml-4">
+          <div class="flex items-center">
+            <h3 class="text-lg font-medium text-gray-900"><%= @student.full_name %></h3>
+            <span class="ml-3 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+              <%= @examination.course.school_class.name %>
+            </span>
+          </div>
+          <p class="text-sm text-gray-500"><%= @examination.title %></p>
+        </div>
+      </div>
+    </div>
 
-  <%= link_to "Show this grade", @grade, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to grades", grades_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+    <div class="px-6 py-6">
+      <%= form_with(model: [@examination, @grade], method: :patch, local: true, class: "space-y-6") do |f| %>
+        <%= f.hidden_field :student_id, value: @student.id %>
+        
+        <div>
+          <div class="flex items-center justify-between">
+            <label for="grade_value" class="block text-sm font-medium text-gray-700">Grade</label>
+            <span class="text-sm text-gray-500">Select a grade from 0 to 20</span>
+          </div>
+          <div class="mt-1 relative w-1/6 border border-gray-300 rounded-lg">
+            <%= f.select :value,
+                options_for_select((0..20).step(0.5).map { |n| [n, n] }, @grade.value),
+                { include_blank: "Select a grade" },
+                class: "block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md appearance-none",
+                required: true
+            %>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+          <% if @grade.value.present? %>
+            <div class="mt-2">
+              <div class="flex items-center space-x-2">
+                <div class="<%= @grade.value >= 12 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %> px-2 py-1 rounded-full text-xs font-semibold inline-flex items-center">
+                  <% if @grade.value >= 12 %>
+                    <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                  <% else %>
+                    <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                  <% end %>
+                  Current grade: <%= @grade.value %>
+                </div>
+                <span class="text-sm text-gray-500">
+                  <%= @grade.value >= 12 ? "Passing grade" : "Failing grade" %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="flex justify-end">
+          <%= f.button type: "submit", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Save Grade
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
