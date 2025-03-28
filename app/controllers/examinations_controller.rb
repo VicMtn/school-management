@@ -1,9 +1,17 @@
 class ExaminationsController < ApplicationController
   before_action :set_examination, only: %i[ show edit update destroy ]
+  before_action :prevent_teacher_edit, only: %i[ edit update destroy ]
 
   # GET /examinations or /examinations.json
   def index
-    @examinations = Examination.all
+    if current_user.person&.type == 'Teacher'
+      teacher = current_user.person
+      @examinations = Examination.joins(:course)
+                               .where(courses: { teacher_id: teacher.id })
+                               .includes(:course)
+    else
+      @examinations = Examination.all.includes(:course)
+    end
   end
 
   # GET /examinations/1 or /examinations/1.json
@@ -66,5 +74,12 @@ class ExaminationsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def examination_params
       params.require(:examination).permit(:title, :effective_date, :course_id)
+    end
+
+    def prevent_teacher_edit
+      if current_user.person&.type == 'Teacher'
+        flash[:alert] = "Teachers are not allowed to modify examinations"
+        redirect_to examinations_path
+      end
     end
 end
