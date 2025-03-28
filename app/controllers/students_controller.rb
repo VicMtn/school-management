@@ -1,6 +1,7 @@
 class StudentsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_student, only: [:show, :edit, :update, :destroy, :grade_report, :promotion_check]
+  before_action :authorize_student_access, only: [:promotion_check]
 
   def index
     @students = Student.includes(:user, :school_classes => [:moment, :master])
@@ -220,5 +221,13 @@ class StudentsController < ApplicationController
 
   def student_params
     params.require(:student).permit(:firstname, :lastname, :address_id, :email, :phone_number, :iban)
+  end
+  
+  def authorize_student_access
+    # Vérifie si l'utilisateur connecté est l'élève lui-même ou un autre utilisateur autorisé (dean, admin)
+    unless current_user.person == @student || current_user.person&.type == "Dean" || current_user.person&.type == "Teacher"
+      flash[:alert] = "Vous n'êtes pas autorisé à accéder à cette page."
+      redirect_to root_path
+    end
   end
 end 
