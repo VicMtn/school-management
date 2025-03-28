@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_28_005720) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_28_021059) do
   create_table "addresses", force: :cascade do |t|
     t.integer "zip"
     t.string "town"
@@ -99,6 +99,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_28_005720) do
     t.integer "sector_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["moment_id"], name: "index_promotion_asserts_on_moment_id"
     t.index ["sector_id"], name: "index_promotion_asserts_on_sector_id"
   end

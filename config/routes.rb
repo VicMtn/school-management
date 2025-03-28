@@ -39,7 +39,11 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
-  resources :promotion_asserts
+  resources :promotion_asserts do
+    member do
+      patch :restore
+    end
+  end
 
   namespace :admin do
     root to: 'dashboard#index', as: :root

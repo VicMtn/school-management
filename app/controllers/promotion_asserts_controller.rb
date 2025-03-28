@@ -1,10 +1,14 @@
 class PromotionAssertsController < ApplicationController
-  before_action :set_promotion_assert, only: %i[ show edit update destroy ]
+  before_action :set_promotion_assert, only: %i[ show edit update destroy restore ]
   before_action :require_admin, except: [:index, :show]
 
   # GET /promotion_asserts or /promotion_asserts.json
   def index
-    @promotion_asserts = PromotionAssert.all
+    if params[:show_archived]
+      @promotion_asserts = PromotionAssert.unscoped.where.not(deleted_at: nil)
+    else
+      @promotion_asserts = PromotionAssert.all
+    end
   end
 
   # GET /promotion_asserts/1 or /promotion_asserts/1.json
@@ -27,7 +31,7 @@ class PromotionAssertsController < ApplicationController
     @promotion_assert = PromotionAssert.new(promotion_assert_params)
 
     if @promotion_assert.save
-      redirect_to promotion_asserts_path, notice: 'Promotion assert was successfully created.'
+      redirect_to promotion_asserts_path, notice: 'Promotion rule was successfully created.'
     else
       load_collections
       render :new, status: :unprocessable_entity
@@ -37,7 +41,7 @@ class PromotionAssertsController < ApplicationController
   # PATCH/PUT /promotion_asserts/1 or /promotion_asserts/1.json
   def update
     if @promotion_assert.update(promotion_assert_params)
-      redirect_to promotion_asserts_path, notice: 'Promotion assert was successfully updated.'
+      redirect_to promotion_asserts_path, notice: 'Promotion rule was successfully updated.'
     else
       load_collections
       render :edit, status: :unprocessable_entity
@@ -46,14 +50,24 @@ class PromotionAssertsController < ApplicationController
 
   # DELETE /promotion_asserts/1 or /promotion_asserts/1.json
   def destroy
-    @promotion_assert.destroy
-    redirect_to promotion_asserts_path, notice: 'Promotion assert was successfully deleted.'
+    @promotion_assert.soft_delete
+    redirect_to promotion_asserts_path, notice: 'Promotion rule was successfully archived.'
+  end
+  
+  # PATCH /promotion_asserts/1/restore
+  def restore
+    @promotion_assert.restore
+    redirect_to promotion_asserts_path(show_archived: true), notice: 'Promotion rule was successfully restored.'
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_promotion_assert
-      @promotion_assert = PromotionAssert.includes(:moment, :sector).find(params[:id])
+      @promotion_assert = if params[:action] == 'restore'
+                           PromotionAssert.unscoped.includes(:moment, :sector).find(params[:id])
+                         else
+                           PromotionAssert.includes(:moment, :sector).find(params[:id])
+                         end
     end
 
     # Only allow a list of trusted parameters through.
