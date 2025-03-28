@@ -1,6 +1,6 @@
 class GradesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_examination
+  before_action :set_examination, except: [:index]
   before_action :set_grade, only: [:edit, :update]
   before_action :set_student, only: [:edit, :create, :update]
 
