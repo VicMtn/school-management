@@ -335,6 +335,9 @@ moments.each do |moment|
       time_slot = time_slots[(i + j) % time_slots.size]
       week_day = week_days[i % week_days.size]
       
+      # Assigner une salle au cours, en favorisant la salle de la classe ou une autre si nécessaire
+      room = [(i + j) % 2 == 0 ? school_class.room : rooms.sample].sample
+      
       courses << Course.create!(
         start_at: time_slot[:start],
         end_at: time_slot[:end],
@@ -343,7 +346,8 @@ moments.each do |moment|
         school_class: school_class,
         moment: moment,
         teacher: subject.teacher,
-        week_day: week_day
+        week_day: week_day,
+        room_id: room.id
       )
     end
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_26_023340) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_28_005720) do
   create_table "addresses", force: :cascade do |t|
     t.integer "zip"
     t.string "town"
@@ -32,7 +32,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_26_023340) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "room_id", null: false
     t.index ["moment_id"], name: "index_courses_on_moment_id"
+    t.index ["room_id"], name: "index_courses_on_room_id"
     t.index ["school_class_id"], name: "index_courses_on_school_class_id"
     t.index ["subject_id"], name: "index_courses_on_subject_id"
     t.index ["teacher_id"], name: "index_courses_on_teacher_id"
@@ -172,6 +174,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_26_023340) do
 
   add_foreign_key "courses", "moments"
   add_foreign_key "courses", "people", column: "teacher_id"
+  add_foreign_key "courses", "rooms"
   add_foreign_key "courses", "school_classes"
   add_foreign_key "courses", "subjects"
   add_foreign_key "examinations", "courses"
