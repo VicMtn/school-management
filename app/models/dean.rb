@@ -1,5 +1,6 @@
 class Dean < Person
   has_many :school_classes, foreign_key: 'master_id'
+  has_many :courses, foreign_key: 'teacher_id'
 
   def current_classes
     # Version originale avec contrainte de date
