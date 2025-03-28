@@ -23,7 +23,11 @@ Rails.application.routes.draw do
       get :promotion_check
     end
   end
-  resources :teachers
+  resources :teachers do
+    member do
+      get :schedule
+    end
+  end
   resources :deans
   resources :courses
   resources :subjects do
@@ -42,7 +46,9 @@ Rails.application.routes.draw do
 
   # Academic resources
   resources :grades
-  resources :examinations
+  resources :examinations do
+    resources :grades, only: [:edit, :update, :create]
+  end
   resources :school_classes
   resources :moments
   resources :sectors
