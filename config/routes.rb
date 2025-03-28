@@ -28,7 +28,11 @@ Rails.application.routes.draw do
       get :schedule
     end
   end
-  resources :deans
+  resources :deans do
+    member do
+      get :schedule
+    end
+  end
   resources :courses
   resources :subjects do
     member do
@@ -62,5 +66,7 @@ Rails.application.routes.draw do
   # PWA routes (commented out)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+
+  patch "/courses/:id/restore", to: "courses#restore", as: "restore_course"
 
 end
