@@ -36,28 +36,27 @@
               </div>
               <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <% if user_signed_in? %>
-                  <% unless current_user.person&.type == 'Teacher' %>
-                    <%= link_to "Dashboard", root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(root_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
-                  <% end %>
-                
                   <% if current_user.person&.type == 'Student' %>
+                    <%= link_to "Dashboard", root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(root_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
                     <%= link_to "Schedule", courses_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(courses_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
-                    <%= link_to "My Classes", school_classes_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(school_classes_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <%= link_to "My Class", school_class_path(current_user.person.current_class), class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(school_class_path(current_user.person.current_class)) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" if current_user.person.current_class %>
                     <%= link_to "My Grades", grades_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(grades_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                  <% elsif current_user.person&.type == 'Teacher' %>
+                    <%= link_to "Schedule", schedule_teacher_path(current_user.person), class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(schedule_teacher_path(current_user.person)) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <%= link_to "My Classes", school_classes_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(school_classes_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <%= link_to "Examinations", examinations_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(examinations_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <%= link_to "Teachers", teachers_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(teachers_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                  <% elsif current_user.person&.type == 'Dean' %>
+                    <%= link_to "Schedule", schedule_dean_path(current_user.person), class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(schedule_dean_path(current_user.person)) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <%= link_to "My Classes", school_classes_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(school_classes_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <%= link_to "Admin", admin_root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(admin_root_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
                   <% else %>
-                    <% if current_user.person&.type == 'Teacher' %>
-                      <%= link_to "My Classes", school_classes_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(school_classes_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
-                      <%= link_to "Examinations", examinations_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(examinations_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
-                      <%= link_to "Teachers", teachers_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(teachers_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
-                    <% elsif current_user.person&.type != 'Dean' %>
+                    <%= link_to "Dashboard", root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(root_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+                    <% if current_user.person&.type != 'Dean' %>
                       <%= link_to "People", people_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(people_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
                       <%= link_to "Deans", deans_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(deans_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
                       <%= link_to "Students", students_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(students_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
                     <% end %>
-                  <% end %>
-
-                  <% if current_user.person && current_user.person.type == 'Dean' %>
-                    <%= link_to "Admin", admin_root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{current_page?(admin_root_path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
                   <% end %>
                 <% end %>
               </div>
@@ -114,35 +113,26 @@
               <span class="text-lg font-bold text-gray-900">ROR Intranet</span>
             </div>
             <% if user_signed_in? %>
-              <% unless current_user.person&.type == 'Teacher' %>
-                <%= link_to "Dashboard", root_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
-              <% end %>
-            
               <% if current_user.person&.type == 'Student' %>
+                <%= link_to "Dashboard", root_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
                 <%= link_to "Schedule", courses_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
-                <%= link_to "My Classes", school_classes_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
+                <%= link_to "My Class", school_class_path(current_user.person.current_class), class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" if current_user.person.current_class %>
                 <%= link_to "My Grades", grades_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
+              <% elsif current_user.person&.type == 'Teacher' %>
+                <%= link_to "Schedule", schedule_teacher_path(current_user.person), class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
+                <%= link_to "My Classes", school_classes_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
+                <%= link_to "Examinations", examinations_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
+                <%= link_to "Teachers", teachers_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
+              <% elsif current_user.person&.type == 'Dean' %>
+                <%= link_to "Schedule", schedule_dean_path(current_user.person), class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
+                <%= link_to "My Classes", school_classes_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
+                <%= link_to "Admin", admin_root_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
               <% else %>
-                <% if current_user.person&.type == 'Teacher' %>
-                  <%= link_to "My Classes", school_classes_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
-                  <%= link_to "Examinations", examinations_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
-                  <%= link_to "Teachers", teachers_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" %>
-                <% elsif current_user.person&.type != 'Dean' %>
+                <%= link_to "Dashboard", root_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
+                <% if current_user.person&.type != 'Dean' %>
                   <%= link_to "People", people_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
                   <%= link_to "Deans", deans_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
                   <%= link_to "Students", students_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" %>
-                <% end %>
-              <% end %>
-
-              <% if current_user.person && current_user.person.type == 'Dean' %>
-                <%= link_to admin_root_path, class: "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" do %>
-                  <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    Admin
-                  </div>
                 <% end %>
               <% end %>
             <% end %>
