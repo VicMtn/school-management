@@ -1,6 +1,6 @@
 class TeachersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_teacher, only: [:show, :edit, :update, :destroy]
+  before_action :set_teacher, only: [:show, :edit, :update, :destroy, :schedule]
 
   def index
     @teachers = Teacher.includes(:user, :school_classes, :school_classes => :moment)
@@ -9,6 +9,11 @@ class TeachersController < ApplicationController
 
   def show
     @teacher = Teacher.includes(:user, :school_classes, [:school_classes => :moment]).find(params[:id])
+  end
+
+  def schedule
+    @teacher = Teacher.includes(:school_classes, :courses).find(params[:id])
+    @courses = @teacher.courses.includes(:subject, :school_class).order(:start_at)
   end
 
   def new
