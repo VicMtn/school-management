@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {
-    registrations: 'users/registrations',
-    sessions: 'users/sessions'
+    registrations: 'users/registrations'
   }
   
   devise_scope :user do
@@ -16,9 +15,7 @@ Rails.application.routes.draw do
     end
   end
 
-  # Retrait des routes people
-  # resources :people, concerns: :admin_accessible
-  
+  resources :people, concerns: :admin_accessible
   resources :students do
     member do
       patch :archive

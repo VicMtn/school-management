@@ -1,6 +1,5 @@
 class PeopleController < ApplicationController
   before_action :set_person, only: %i[ show edit update destroy ]
-  before_action :redirect_to_404
 
   # GET /people or /people.json
   def index
@@ -67,9 +66,5 @@ class PeopleController < ApplicationController
     # Only allow a list of trusted parameters through.
     def person_params
       params.require(:person).permit(:username, :lastname, :firstname, :email, :phone_number, :iban, :role, :status_id, :address_id)
-    end
-
-    def redirect_to_404
-      render "errors/not_found", status: :not_found
     end
 end

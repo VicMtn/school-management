@@ -250,20 +250,6 @@ Devise.setup do |config|
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
 
-  # ==> Flash messages
-  # Disable the flash messages for successful sign in
-  config.skip_session_storage = [:http_auth]
-  config.navigational_formats = ['*/*', :html, :turbo_stream]
-  config.parent_controller = 'ActionController::Base'
-  
-  # Remove all flash messages on sign in/sign out
-  config.clear_respond_to
-  config.respond_to do |format|
-    format.html { redirect_to after_sign_in_path_for(resource) }
-    format.json { render json: resource }
-    format.all
-  end
-
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
