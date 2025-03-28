@@ -5,8 +5,7 @@ class SchoolClassesController < ApplicationController
   # GET /school_classes or /school_classes.json
   def index
     if user_signed_in? && current_user.person&.type == 'Student'
-      @current_class = current_user.person.current_class
-      @classmates = @current_class.students.order(:lastname)
+      redirect_to school_class_path(current_user.person.current_class)
     else
       @school_classes = SchoolClass.all.includes(:moment).order(:name)
     end
@@ -14,6 +13,14 @@ class SchoolClassesController < ApplicationController
 
   # GET /school_classes/1 or /school_classes/1.json
   def show
+    if user_signed_in? && current_user.person&.type == 'Student'
+      # Pour un étudiant, on montre sa classe actuelle
+      @school_class = current_user.person.current_class
+      redirect_to school_classes_path if @school_class.nil?
+      @classmates = @school_class.students.order(:lastname) if @school_class
+    end
+    # Pour les autres utilisateurs, on montre la classe qu'ils ont demandée
+    # (déjà chargée par set_school_class)
   end
 
   # GET /school_classes/new
@@ -23,6 +30,10 @@ class SchoolClassesController < ApplicationController
 
   # GET /school_classes/1/edit
   def edit
+    @rooms = Room.all
+    @moments = Moment.all
+    @sectors = Sector.all
+    @teachers = Person.where(type: ['Teacher', 'Dean'])
   end
 
   # POST /school_classes or /school_classes.json
