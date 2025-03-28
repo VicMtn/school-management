@@ -15,7 +15,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people, concerns: :admin_accessible
+  # Retrait des routes people
+  # resources :people, concerns: :admin_accessible
+  
   resources :students do
     member do
       patch :archive
