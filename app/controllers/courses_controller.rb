@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_course, only: [:show, :edit, :update, :destroy]
+  before_action :set_course, only: [:show, :edit, :update, :destroy, :restore]
   before_action :require_admin, except: [:index, :show]
 
   # GET /courses or /courses.json
@@ -9,7 +9,11 @@ class CoursesController < ApplicationController
       @current_class = current_user.person.current_class
       @courses = @current_class.courses.includes(:subject, :teacher).order(:start_at)
     else
-      @courses = Course.all.includes(:subject, :teacher, :school_class).order(:start_at)
+      if params[:show_archived]
+        @courses = Course.unscoped.where.not(deleted_at: nil).includes(:subject, :teacher, :school_class, :room).order(:start_at)
+      else
+        @courses = Course.all.includes(:subject, :teacher, :school_class, :room).order(:start_at)
+      end
     end
   end
 
@@ -55,16 +59,22 @@ class CoursesController < ApplicationController
     @course.soft_delete
     redirect_to courses_url, notice: 'Course was successfully archived.'
   end
+  
+  # PATCH/PUT /courses/1/restore
+  def restore
+    @course.restore
+    redirect_to courses_path(show_archived: true), notice: 'Course was successfully restored.'
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_course
-      @course = Course.includes(:subject, :teacher, :school_class, :moment).find(params[:id])
+      @course = Course.includes(:subject, :teacher, :school_class, :moment, :room).find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def course_params
-      params.require(:course).permit(:start_at, :end_at, :archived, :subject_id, :school_class_id, :moment_id, :teacher_id, :week_day)
+      params.require(:course).permit(:start_at, :end_at, :archived, :subject_id, :school_class_id, :moment_id, :teacher_id, :week_day, :room_id)
     end
     
     def load_collections
@@ -72,5 +82,6 @@ class CoursesController < ApplicationController
       @subjects = Subject.all.order(:name)
       @school_classes = SchoolClass.all.order(:name)
       @moments = Moment.all.order(start_on: :desc)
+      @rooms = Room.all.order(:name)
     end
 end
